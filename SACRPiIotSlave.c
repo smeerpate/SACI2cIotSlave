@@ -9,20 +9,25 @@
     GPIO19 = BSCSL_SCK
     
     Credits:
-    Using the pigpio library http://abyz.me.uk/rpi/pigpio
-    Thank you abyz.me.uk.
-    Thank you rameyjm7 for the usefull example code.
-    https://github.com/rameyjm7/rpi_i2c_slave
+    - Using the pigpio library http://abyz.me.uk/rpi/pigpio
+		Thank you abyz.me.uk.
+    - Thank you rameyjm7 for the usefull example code.
+		https://github.com/rameyjm7/rpi_i2c_slave
+	- Thanks to Jerry Jeremiah for his forum answer:
+		https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response
 */
 
 #include <pigpio.h>
 #include "stdio.h"
 #include <stdlib.h>
-#include "string.h"
+#include "string.h" /* memcpy, memset */
 #include "unistd.h"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <time.h>
+#include <sys/socket.h> /* socket, connect */
+#include <netinet/in.h> /* struct sockaddr_in, struct sockaddr */
+#include <netdb.h> /* struct hostent, gethostbyname */
 
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
@@ -105,6 +110,13 @@ uint8_t mabUpstreamDataBuffer[UPSTREAMBUFFERSIZE] = {0x00};
 uint8_t mabDownstreamDataBuffer[DOWNSTREAMBUFFERSIZE] = {0x00};
 time_t sRawTime;
 char sTimeStamp[32] = {0x00};
+
+char *msHttpHost;
+int miHttpPortNo;
+char *msHttpMsgFmt;
+struct hostent *msHttpServer;
+struct sockaddr_in msHttpServerAddr;
+int miHttpSocketFd;
 /****************************************************/
 
 
@@ -116,6 +128,7 @@ void closeSlave();
 char* getTimestamp();
 float getTickSec();
 int getControlBits(int, bool);
+int httpSocketInit();
 /****************************************************/
 
 
@@ -375,7 +388,45 @@ int getControlBits(int address /* 7 bit address */, bool open) {
 }
 
 
+int httpSocketInit()
+{
+	/* first what are we going to send and where are we going to send it? */
+	/* send a post to:
+		https://dashboard.safeandclean.be/http/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
+	*/
+    miHttpPortNo = 80;
+    msHttpHost = "https://dashboard.safeandclean.be/http";
+    msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
+	
+	/* create the http socket */
+    miHttpSocketFd = miHttpSocketFd(AF_INET, SOCK_STREAM, 0);
+    if (miHttpSocketFd < 0)
+	{
+		printf("[ERROR] (%s) %s: Failed to open socket\n", getTimestamp(), __func__);
+		return -1;
+	}
+	
+	/* lookup the server ip address */
+    msHttpServer = gethostbyname(msHttpHost);
+    if (msHttpServer == NULL) 
+	{
+		printf("[ERROR] (%s) %s: No such host: %s\n", getTimestamp(), __func__, msHttpHost);
+		return -1;
+	}
+	
+	/* clear and fill in the server address structure */
+    memset(&msHttpServerAddr,0,sizeof(msHttpServerAddr));
+    msHttpServerAddr.sin_family = AF_INET;
+    msHttpServerAddr.sin_port = htons(miHttpPortNo);
+    memcpy(&msHttpServerAddr.sin_addr.s_addr,msHttpServer->h_addr,msHttpServer->h_length);
+	
+	printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=0x%x, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
+	
+	return 0;
+}
+
 int main(int argc, char* argv[]){
+	httpSocketInit();
     runSlave();
     return 0;
 }
