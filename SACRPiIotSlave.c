@@ -395,7 +395,7 @@ int httpSocketInit()
 		https://dashboard.safeandclean.be/http/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
 	*/
     miHttpPortNo = 80;
-    msHttpHost = "https://dashboard.safeandclean.be/http";
+    msHttpHost = "dashboard.safeandclean.be/http";
     msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
 	
 	/* create the http socket */
