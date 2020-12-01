@@ -1,0 +1,16 @@
+[Unit]
+Description=SACIot service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/iot/SACRPiIotSlave
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=SACIotSlave
+Restart=on-failure
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
