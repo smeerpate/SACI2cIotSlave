@@ -399,7 +399,7 @@ int httpSocketInit()
     msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
 	
 	/* create the http socket */
-    miHttpSocketFd = miHttpSocketFd(AF_INET, SOCK_STREAM, 0);
+    miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (miHttpSocketFd < 0)
 	{
 		printf("[ERROR] (%s) %s: Failed to open socket\n", getTimestamp(), __func__);
@@ -420,7 +420,7 @@ int httpSocketInit()
     msHttpServerAddr.sin_port = htons(miHttpPortNo);
     memcpy(&msHttpServerAddr.sin_addr.s_addr,msHttpServer->h_addr,msHttpServer->h_length);
 	
-	printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=0x%x, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
+	printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
 	
 	return 0;
 }
