@@ -28,6 +28,7 @@
 #include <sys/socket.h> /* socket, connect */
 #include <netinet/in.h> /* struct sockaddr_in, struct sockaddr */
 #include <netdb.h> /* struct hostent, gethostbyname */
+#include <signal.h>
 
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
@@ -128,6 +129,7 @@ void closeSlave();
 char* getTimestamp();
 float getTickSec();
 int getControlBits(int, bool);
+void closeSlave();
 int httpSocketInit();
 /****************************************************/
 
@@ -388,6 +390,18 @@ int getControlBits(int address /* 7 bit address */, bool open) {
 }
 
 
+void closeSlave()
+{
+    gpioInitialise();
+    xfer.control = getControlBits(slaveAddress, false);
+    bscXfer(&xfer);
+    printf("[INFO] (%s) %s: Closed slave.\n", getTimestamp(), __func__);
+    gpioTerminate();
+    printf("[INFO] (%s) %s: Terminated GPIOs.\n", getTimestamp(), __func__);
+    return 0;
+}
+
+
 int httpSocketInit()
 {
     /* first what are we going to send and where are we going to send it? */
@@ -426,8 +440,10 @@ int httpSocketInit()
 }
 
 int main(int argc, char* argv[]){
+    signal(SIGINT, closeSlave);
     httpSocketInit();
     runSlave();
+    closeSlave();
     return 0;
 }
 
