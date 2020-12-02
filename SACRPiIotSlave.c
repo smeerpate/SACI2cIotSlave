@@ -130,6 +130,7 @@ char* getTimestamp();
 float getTickSec();
 int getControlBits(int, bool);
 void closeSlave();
+void SIGHandler(int signum);
 int httpSocketInit();
 /****************************************************/
 
@@ -398,7 +399,12 @@ void closeSlave()
     printf("[INFO] (%s) %s: Closed slave.\n", getTimestamp(), __func__);
     gpioTerminate();
     printf("[INFO] (%s) %s: Terminated GPIOs.\n", getTimestamp(), __func__);
-    exit(0);
+}
+
+void SIGHandler(int signum)
+{
+    closeSlave();
+    exit(signum);
 }
 
 
@@ -440,7 +446,7 @@ int httpSocketInit()
 }
 
 int main(int argc, char* argv[]){
-    signal(SIGINT, closeSlave);
+    signal(SIGINT, SIGHandler);
     httpSocketInit();
     runSlave();
     closeSlave();
