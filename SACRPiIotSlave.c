@@ -530,7 +530,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         sprintf(sParsedByte, "%x02", I2CRxPayloadAddress + iBytesCurrentlyProcessed);
         strcat(sUpstreamMsg, sParsedByte);
         iBytesCurrentlyProcessed += 1;
-    } while(iBytesCurrentlyProcessed < I2CRxPayloadLength);
+    } while(iBytesCurrentlyProcessed < UPSTREAMBUFFERSIZE);
     
     msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
     sprintf(msHttpTxMessage, msHttpMsgFmt, "0", "0", "0", "0", sUpstreamMsg);
