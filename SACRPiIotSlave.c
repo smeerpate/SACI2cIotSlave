@@ -10,11 +10,11 @@
     
     Credits:
     - Using the pigpio library http://abyz.me.uk/rpi/pigpio
-		Thank you abyz.me.uk.
+        Thank you abyz.me.uk.
     - Thank you rameyjm7 for the usefull example code.
-		https://github.com/rameyjm7/rpi_i2c_slave
-	- Thanks to Jerry Jeremiah for his forum answer:
-		https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response
+        https://github.com/rameyjm7/rpi_i2c_slave
+    - Thanks to Jerry Jeremiah for his forum answer:
+        https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response
 */
 
 #include <pigpio.h>
@@ -86,7 +86,7 @@ typedef enum
     S_FLAGERROR_INVALIDSTX,
     S_PARSECMDSEND,
     S_PARSECMDREADENA,
-	S_BUILDRESPONSE,
+    S_BUILDRESPONSE,
 } tSmState;
 
 /********************** Globals *********************/
@@ -165,8 +165,8 @@ void runSlave()
         printf("[INFO] (%s) %s: Successfully opened i2c slave. Status = %i.\n", getTimestamp(), __func__, iStatus);
         printf("[INFO] (%s) %s: FIFO size is %i bytes\n", getTimestamp(), __func__, BSC_FIFO_SIZE);
         sI2cTransfer.rxCnt = 0;
-		sI2cStatus.txBusy = 0;
-		sI2cStatus.rxBusy = 0;
+        sI2cStatus.txBusy = 0;
+        sI2cStatus.rxBusy = 0;
         // Start listening...
         while(1)
         {
@@ -186,14 +186,14 @@ void listeningTask()
     uint8_t *pPayload;
     uint8_t bEtx;
     static uint8_t bErrorResponse = 0x00;
-	static uint8_t bLastDownLinkIndicatorCode = 0xFF;
+    static uint8_t bLastDownLinkIndicatorCode = 0xFF;
     // Protocol state machine.
     // update the transfer struct and get the peripheral status.
     switch (sState)
     {
         case S_IDLE:
             sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-			sI2cTransfer.txCnt = 0; // set the fifo pointer to 0
+            sI2cTransfer.txCnt = 0; // set the fifo pointer to 0
             if(sI2cTransfer.rxCnt == 0 || sI2cStatus.rxBusy == 1)
             {
                 // No new data available or busy with incoming data.
@@ -253,20 +253,20 @@ void listeningTask()
             pPayload = (uint8_t *)&sI2cTransfer.rxBuf[4];
             bEtx = *(pPayload + bPayloadSize - 1);
             printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", getTimestamp(), __func__, bPayloadSize, (uint32_t)pPayload, bEtx);
-			// save rx command status
-			bLastDownLinkIndicatorCode = sI2cTransfer.rxBuf[3];
-			if (bEtx == IOTETX)
-			{
-				// received correct ETX
-				bErrorResponse = 0x00;
-			}
-			else
-			{
-				// received incorrect ETX
-				bErrorResponse = 0x03; // flag invalid command error
-			}
-			// were done with the received data reset Rx count
-			sI2cTransfer.rxCnt = 0;
+            // save rx command status
+            bLastDownLinkIndicatorCode = sI2cTransfer.rxBuf[3];
+            if (bEtx == IOTETX)
+            {
+                // received correct ETX
+                bErrorResponse = 0x00;
+            }
+            else
+            {
+                // received incorrect ETX
+                bErrorResponse = 0x03; // flag invalid command error
+            }
+            // were done with the received data reset Rx count
+            sI2cTransfer.rxCnt = 0;
             sState = S_IDLE;
             break;
             
@@ -276,52 +276,52 @@ void listeningTask()
             printf("[INFO] (%s) %s: IoT read enable command: ETX = 0x%x\n", getTimestamp(), __func__, bEtx);
             sState = S_BUILDRESPONSE;
             break;
-			
+            
 
-		case S_BUILDRESPONSE:
-			printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", getTimestamp(), __func__, bLastDownLinkIndicatorCode, bErrorResponse);
+        case S_BUILDRESPONSE:
+            printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", getTimestamp(), __func__, bLastDownLinkIndicatorCode, bErrorResponse);
             switch(bLastDownLinkIndicatorCode)
-			{
-				case 0x00:
-					// Master did not ask for downlink data. Only send Error code.
-					sI2cTransfer.txBuf[0] = IOTSTX;
-					sI2cTransfer.txBuf[1] = 0x02;
-					sI2cTransfer.txBuf[2] = bErrorResponse;
-					sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
-					sI2cTransfer.txBuf[4] = IOTETX;
-					sI2cTransfer.txCnt = 5;
-					break;
-				case 0x01:
-					// Master DID ask for downlink data.
-					sI2cTransfer.txBuf[0] = IOTSTX;
-					sI2cTransfer.txBuf[1] = 0x02;
-					sI2cTransfer.txBuf[2] = bErrorResponse;
-					sI2cTransfer.txBuf[3] = 0x08;
-					sI2cTransfer.txBuf[4] = 0x36;
-					sI2cTransfer.txBuf[5] = 0x30;
-					sI2cTransfer.txBuf[6] = 0x1f;
-					sI2cTransfer.txBuf[7] = 0x73;
-					sI2cTransfer.txBuf[8] = 0xBE;
-					sI2cTransfer.txBuf[9] = 0xEF;
-					sI2cTransfer.txBuf[10] = 0xBE;
-					sI2cTransfer.txBuf[11] = 0xEF;
-					sI2cTransfer.txBuf[12] = IOTETX;
-					sI2cTransfer.txCnt = 13;
-					break;
-				default:
-					// unknown response code
-					printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", getTimestamp(), __func__, sI2cTransfer.rxBuf[3]);
-					sI2cTransfer.txBuf[0] = IOTSTX;
-					sI2cTransfer.txBuf[1] = 0x02;
-					sI2cTransfer.txBuf[2] = 0x03;
-					sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
-					sI2cTransfer.txBuf[4] = IOTETX;
-					sI2cTransfer.txCnt = 5;
-					break;
-			}
-			sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-			sI2cTransfer.txCnt = 0; // set the fifo pointer to 0. Important to set this so master can read the right data.
-			sState = S_IDLE;
+            {
+                case 0x00:
+                    // Master did not ask for downlink data. Only send Error code.
+                    sI2cTransfer.txBuf[0] = IOTSTX;
+                    sI2cTransfer.txBuf[1] = 0x02;
+                    sI2cTransfer.txBuf[2] = bErrorResponse;
+                    sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
+                    sI2cTransfer.txBuf[4] = IOTETX;
+                    sI2cTransfer.txCnt = 5;
+                    break;
+                case 0x01:
+                    // Master DID ask for downlink data.
+                    sI2cTransfer.txBuf[0] = IOTSTX;
+                    sI2cTransfer.txBuf[1] = 0x02;
+                    sI2cTransfer.txBuf[2] = bErrorResponse;
+                    sI2cTransfer.txBuf[3] = 0x08;
+                    sI2cTransfer.txBuf[4] = 0x36;
+                    sI2cTransfer.txBuf[5] = 0x30;
+                    sI2cTransfer.txBuf[6] = 0x1f;
+                    sI2cTransfer.txBuf[7] = 0x73;
+                    sI2cTransfer.txBuf[8] = 0xBE;
+                    sI2cTransfer.txBuf[9] = 0xEF;
+                    sI2cTransfer.txBuf[10] = 0xBE;
+                    sI2cTransfer.txBuf[11] = 0xEF;
+                    sI2cTransfer.txBuf[12] = IOTETX;
+                    sI2cTransfer.txCnt = 13;
+                    break;
+                default:
+                    // unknown response code
+                    printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", getTimestamp(), __func__, sI2cTransfer.rxBuf[3]);
+                    sI2cTransfer.txBuf[0] = IOTSTX;
+                    sI2cTransfer.txBuf[1] = 0x02;
+                    sI2cTransfer.txBuf[2] = 0x03;
+                    sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
+                    sI2cTransfer.txBuf[4] = IOTETX;
+                    sI2cTransfer.txCnt = 5;
+                    break;
+            }
+            sI2cStatus.i32 = bscXfer(&sI2cTransfer);
+            sI2cTransfer.txCnt = 0; // set the fifo pointer to 0. Important to set this so master can read the right data.
+            sState = S_IDLE;
             break;
             
         default:
@@ -390,43 +390,43 @@ int getControlBits(int address /* 7 bit address */, bool open) {
 
 int httpSocketInit()
 {
-	/* first what are we going to send and where are we going to send it? */
-	/* send a post to:
-		https://dashboard.safeandclean.be/http/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
-	*/
+    /* first what are we going to send and where are we going to send it? */
+    /* send a post to:
+        https://dashboard.safeandclean.be/http/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
+    */
     miHttpPortNo = 80;
     msHttpHost = "dashboard.safeandclean.be/http";
     msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
-	
-	/* create the http socket */
+    
+    /* create the http socket */
     miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (miHttpSocketFd < 0)
-	{
-		printf("[ERROR] (%s) %s: Failed to open socket\n", getTimestamp(), __func__);
-		return -1;
-	}
-	
-	/* lookup the server ip address */
+    {
+        printf("[ERROR] (%s) %s: Failed to open socket\n", getTimestamp(), __func__);
+        return -1;
+    }
+    
+    /* lookup the server ip address */
     msHttpServer = gethostbyname(msHttpHost);
     if (msHttpServer == NULL) 
-	{
-		printf("[ERROR] (%s) %s: No such host: %s\n", getTimestamp(), __func__, msHttpHost);
-		return -1;
-	}
-	
-	/* clear and fill in the server address structure */
+    {
+        printf("[ERROR] (%s) %s: No such host: %s\n", getTimestamp(), __func__, msHttpHost);
+        return -1;
+    }
+    
+    /* clear and fill in the server address structure */
     memset(&msHttpServerAddr,0,sizeof(msHttpServerAddr));
     msHttpServerAddr.sin_family = AF_INET;
     msHttpServerAddr.sin_port = htons(miHttpPortNo);
     memcpy(&msHttpServerAddr.sin_addr.s_addr,msHttpServer->h_addr,msHttpServer->h_length);
-	
-	printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
-	
-	return 0;
+    
+    printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
+    
+    return 0;
 }
 
 int main(int argc, char* argv[]){
-	httpSocketInit();
+    httpSocketInit();
     runSlave();
     return 0;
 }
