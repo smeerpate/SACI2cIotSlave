@@ -520,8 +520,20 @@ int httpSendRequest()
 ************************************************************/
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 {
+    char sUpstreamMsg[UPSTREAMBUFFERSIZE*2 + 1] = {0x00};
+    char sParsedByte[3] = {0x00}; // adding '/0' character
+    int iBytesCurrentlyProcessed = 0;
+    
+    // prepare upstream payload data
+    do
+    {
+        sprintf(sParsedByte, "%x02", I2CRxPayloadAddress + iBytesCurrentlyProcessed);
+        strcat(sUpstreamMsg, sParsedByte);
+        iBytesCurrentlyProcessed += 1;
+    } while(iBytesCurrentlyProcessed < I2CRxPayloadLength);
+    
     msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
-    sprintf(msHttpTxMessage, msHttpMsgFmt, "0", "0", "0", "0", "0");
+    sprintf(msHttpTxMessage, msHttpMsgFmt, "0", "0", "0", "0", sUpstreamMsg);
 }
 
 int main(int argc, char* argv[]){
