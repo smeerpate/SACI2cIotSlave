@@ -312,7 +312,7 @@ void listeningTask()
                     sI2cTransfer.txBuf[4] = 0x36;
                     sI2cTransfer.txBuf[5] = 0x30;
                     sI2cTransfer.txBuf[6] = 0x1f;
-                    sI2cTransfer.txBuf[7] = 0x73;
+                    sI2cTransfer.txBuf[7] = 0x03;
                     sI2cTransfer.txBuf[8] = 0xBE;
                     sI2cTransfer.txBuf[9] = 0xEF;
                     sI2cTransfer.txBuf[10] = 0xBE;
