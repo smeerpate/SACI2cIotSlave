@@ -527,7 +527,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     // prepare upstream payload data
     do
     {
-        sprintf(sParsedByte, "%x02", I2CRxPayloadAddress + iBytesCurrentlyProcessed);
+        sprintf(sParsedByte, "%02x", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)));
         strcat(sUpstreamMsg, sParsedByte);
         iBytesCurrentlyProcessed += 1;
     } while(iBytesCurrentlyProcessed < UPSTREAMBUFFERSIZE);
