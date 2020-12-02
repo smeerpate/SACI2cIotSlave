@@ -137,7 +137,7 @@ void closeSlave();
 void SIGHandler(int signum);
 int httpSocketInit();
 int httpSendRequest();
-void httpBuildRequestMsg(char *I2CRxPayload, int I2CRxPayloadLength);
+void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
 /****************************************************/
 
 
@@ -470,7 +470,7 @@ int httpSendRequest()
     iBytesCurrentlyProcessed = 0;
     do
     {
-        iBytesCurrentlyProcessed = write(miHttpSocketFd, (uint32_t)msHttpTxMessage + (uint32_t)iBytesSent, iBytesToProcess - iBytesSent);
+        iBytesCurrentlyProcessed = write(miHttpSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
         if(iBytesCurrentlyProcessed < 0)
         {
             printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
@@ -491,7 +491,7 @@ int httpSendRequest()
     iBytesToProcess = sizeof(msHttpRxMessage) - 1;
     do
     {
-        iBytesCurrentlyProcessed = read(miHttpSocketFd, (uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived, iBytesToProcess - iBytesReceived);
+        iBytesCurrentlyProcessed = read(miHttpSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
         if(iBytesCurrentlyProcessed < 0)
         {
             printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
