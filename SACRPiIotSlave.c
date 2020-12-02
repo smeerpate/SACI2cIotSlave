@@ -398,7 +398,7 @@ void closeSlave()
     printf("[INFO] (%s) %s: Closed slave.\n", getTimestamp(), __func__);
     gpioTerminate();
     printf("[INFO] (%s) %s: Terminated GPIOs.\n", getTimestamp(), __func__);
-    return 0;
+    exit(0);
 }
 
 
