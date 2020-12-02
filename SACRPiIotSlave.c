@@ -38,6 +38,8 @@
 #define IOTSTX                  '#'
 #define IOTETX                  '\n'
 
+#define HTTPMSGMAXSIZE          512
+
 typedef union
 {
     struct
@@ -118,6 +120,8 @@ char *msHttpMsgFmt;
 struct hostent *msHttpServer;
 struct sockaddr_in msHttpServerAddr;
 int miHttpSocketFd;
+char msHttpTxMessage[HTTPMSGMAXSIZE] = {0x00};
+char msHttpRxMessage[HTTPMSGMAXSIZE] = {0x00};
 /****************************************************/
 
 
@@ -132,6 +136,8 @@ int getControlBits(int, bool);
 void closeSlave();
 void SIGHandler(int signum);
 int httpSocketInit();
+int httpSendRequest();
+void httpBuildRequestMsg(char *I2CRxPayload, int I2CRxPayloadLength);
 /****************************************************/
 
 
@@ -262,6 +268,9 @@ void listeningTask()
             {
                 // received correct ETX
                 bErrorResponse = 0x00;
+                // try to send http request with payload
+                httpBuildRequestMsg(pPayload, bPayloadSize);
+                httpSendRequest();
             }
             else
             {
@@ -416,7 +425,6 @@ int httpSocketInit()
     */
     miHttpPortNo = 80;
     msHttpHost = "dashboard.safeandclean.be/http";
-    msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
     
     /* create the http socket */
     miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -435,14 +443,85 @@ int httpSocketInit()
     }
     
     /* clear and fill in the server address structure */
-    memset(&msHttpServerAddr,0,sizeof(msHttpServerAddr));
+    memset(&msHttpServerAddr, 0, sizeof(msHttpServerAddr));
     msHttpServerAddr.sin_family = AF_INET;
     msHttpServerAddr.sin_port = htons(miHttpPortNo);
-    memcpy(&msHttpServerAddr.sin_addr.s_addr,msHttpServer->h_addr,msHttpServer->h_length);
+    memcpy(&msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
     
     printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
     
     return 0;
+}
+
+
+/************** int httpSendRequest() *********************
+    Uses the buffers 
+    char msHttpTxMessage[HTTPMSGMAXSIZE]
+    char msHttpRxMessage[HTTPMSGMAXSIZE]
+************************************************************/
+int httpSendRequest()
+{
+    int iBytesToProcess = strlen(msHttpTxMessage);
+    int iBytesSent = 0;
+    int iBytesReceived = 0;
+    int iBytesCurrentlyProcessed;
+    
+    /* send the request */
+    iBytesCurrentlyProcessed = 0;
+    do
+    {
+        iBytesCurrentlyProcessed = write(miHttpSocketFd, msHttpTxMessage + (char *)iBytesSent, iBytesToProcess - iBytesSent);
+        if(iBytesCurrentlyProcessed < 0)
+        {
+            printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
+            return -1;
+        }
+        if(iBytesCurrentlyProcessed == 0)
+        {
+            break;
+        }
+        iBytesSent += iBytesCurrentlyProcessed;
+    } while(iBytesSent < iBytesToProcess);
+    
+    printf("[INFO] (%s) %s: %i http request message bytes written to socket: %s\n", getTimestamp(), __func__, iBytesSent, msHttpTxMessage);
+    
+    /* receive the response */
+    iBytesCurrentlyProcessed = 0;
+    memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage)); // clear buffer
+    iBytesToProcess = sizeof(msHttpRxMessage) - 1;
+    do
+    {
+        iBytesCurrentlyProcessed = read(miHttpSocketFd, msHttpRxMessage + (char *)iBytesReceived, iBytesToProcess - iBytesReceived);
+        if(iBytesCurrentlyProcessed < 0)
+        {
+            printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
+            return -1;
+        }
+        if(iBytesCurrentlyProcessed == 0)
+        {
+            break;
+        }
+        iBytesReceived += iBytesCurrentlyProcessed;
+    } while(iBytesReceived < iBytesToProcess);
+    
+    if(iBytesReceived == iBytesToProcess)
+    {
+        printf("[ERROR] (%s) %s: Receive buffer ran out of space. Max. number of bytes: %i.\n", getTimestamp(), __func__, HTTPMSGMAXSIZE);
+        return -1;
+    }
+    
+    close(miHttpSocketFd);
+    return 0;
+}
+
+/******************* httpBuildRequestMsg *******************
+    *) befor usage, int httpSocketInit() must be executed first.
+    *) Is required for int httpSendRequest().
+************************************************************/
+void httpBuildRequestMsg(char *I2CRxPayload, int I2CRxPayloadLength)
+{
+    msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
+    sprintf(msHttpTxMessage, msHttpMsgFmt, "0", "0", "0", "0", "0");
 }
 
 int main(int argc, char* argv[]){
