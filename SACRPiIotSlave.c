@@ -393,7 +393,7 @@ int getControlBits(int address /* 7 bit address */, bool open) {
 void closeSlave()
 {
     gpioInitialise();
-    sI2cTransfer.control = getControlBits(slaveAddress, false);
+    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false);
     bscXfer(&sI2cTransfer);
     printf("[INFO] (%s) %s: Closed slave.\n", getTimestamp(), __func__);
     gpioTerminate();
