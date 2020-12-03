@@ -47,7 +47,7 @@
 #define HTTPMSGMAXSIZE          4096
 #define GENERICSTRBUFFERSIZE    256
 
-#define USESSL                  0
+#define USESSL                  1
 
 typedef union
 {
@@ -143,7 +143,7 @@ void listeningTask();
 void closeSlave();
 char* getTimestamp();
 float getTickSec();
-int getControlBits(int, bool);
+int getControlBits(int address, bool open, bool rxEnable);
 void closeSlave();
 void SIGHandler(int signum);
 
@@ -171,11 +171,11 @@ uint8_t slave_init()
         printf("[INFO] (%s) %s: Initialized GPIOs\n", getTimestamp(), __func__);
     }
     // Close old device (if any)
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false); // To avoid conflicts when restarting
+    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false); // To avoid conflicts when restarting
     bscXfer(&sI2cTransfer);
     // Set I2C slave Address
     printf("[INFO] (%s) %s: Setting I2C slave address to 0x%02x\n", getTimestamp(), __func__, I2CSALAVEADDRESS7);
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true);
+    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
     iResult = bscXfer(&sI2cTransfer); // Should now be visible in I2C-Scanners
     return iResult;
 }
@@ -284,9 +284,15 @@ void listeningTask()
             {
                 // received correct ETX
                 bErrorResponse = 0x00;
+                // tell master to back off
+                sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
+                bscXfer(&sI2cTransfer);
                 // try to send http request with payload
                 httpBuildRequestMsg((uint32_t)pPayload, bPayloadSize);
                 httpSendRequest();
+                // tell master were back
+                sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
+                bscXfer(&sI2cTransfer);
             }
             else
             {
@@ -379,7 +385,7 @@ float getTickSec()
 }
 
 
-int getControlBits(int address /* 7 bit address */, bool open) {
+int getControlBits(int address /* 7 bit address */, bool open, bool rxEnable) {
     /*
     Excerpt from http://abyz.me.uk/rpi/pigpio/cif.html#bscXfer regarding the control bits:
 
@@ -409,8 +415,21 @@ int getControlBits(int address /* 7 bit address */, bool open) {
     // Flags like this: 0b/*IT:*/0/*HC:*/0/*TF:*/0/*IR:*/0/*RE:*/0/*TE:*/0/*BK:*/0/*EC:*/0/*ES:*/0/*PL:*/0/*PH:*/0/*I2:*/0/*SP:*/0/*EN:*/0;
 
     int flags;
+    int iEN = 0;
+    int iI2 = 0;
+    if(rxEnable)
+    {
+        iEN = (1 << 0);
+        iI2 = (1 << 2);
+    }
+    else
+    {
+        iEN = (0 << 0);
+        iI2 = (0 << 2);
+    }
+    
     if(open)
-        flags = /*RE:*/ (1 << 9) | /*TE:*/ (1 << 8) | /*I2:*/ (1 << 2) | /*EN:*/ (1 << 0);
+        flags = /*RE:*/ (1 << 9) | /*TE:*/ (1 << 8) | /*I2:*/ iI2 | /*EN:*/ iEN;
     else // Close/Abort
         flags = /*BK:*/ (1 << 7) | /*I2:*/ (0 << 2) | /*EN:*/ (0 << 0);
 
@@ -421,7 +440,7 @@ int getControlBits(int address /* 7 bit address */, bool open) {
 void closeSlave()
 {
     gpioInitialise();
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false);
+    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false);
     bscXfer(&sI2cTransfer);
     printf("[INFO] (%s) %s: Closed slave.\n", getTimestamp(), __func__);
     gpioTerminate();
@@ -441,7 +460,12 @@ int httpSocketInit()
     /* send a post to:
         https://dashboard.safeandclean.be/mobile/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
     */
-    miHttpPortNo = 80;
+    #if USESSL == 1
+        miHttpPortNo = 443;
+    #else
+        miHttpPortNo = 80;
+    #endif
+    
     msHttpHost = "dashboard.safeandclean.be";
     
     /* create the http socket */
