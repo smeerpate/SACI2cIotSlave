@@ -15,6 +15,9 @@
         https://github.com/rameyjm7/rpi_i2c_slave
     - Thanks to Jerry Jeremiah for his forum answer:
         https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response
+        
+    Compile:
+        gcc -Wall -pthread -o SACRPiIotSlave SACRPiIotSlave.c -lpigpio -lrt -lssl
 */
 
 #include <pigpio.h>
@@ -487,6 +490,19 @@ int httpSendRequest()
         printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iErrsv);
         return -1;
     }
+    
+    #if USESSL == 1
+    // create an SSL connection and attach it to the socket
+    SSL *sSSLConn = SSL_new(sSSLContext);
+    SSL_set_fd(sSSLConn, miHttpSocketFd);
+    iResult = SSL_connect(sSSLConn);
+    if (iResult != 1)
+    {
+        int iErrsv = errno;
+        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iErrsv);
+        return -1;
+    }
+    #endif
         
     /* send the request */
     httpWriteMsgToSocket(miHttpSocketFd);
@@ -494,10 +510,18 @@ int httpSendRequest()
     /* receive the response */
     httpReadRespFromSocket(miHttpSocketFd);
     
+    #if USESSL == 1
+        SSL_shutdown(sSSLConn);
+    #endif
+    
     close(miHttpSocketFd);
     return 0;
 }
 
+/************* int httpWriteMsgToSocket *********************
+    Uses the buffer: 
+    char msHttpTxMessage[HTTPMSGMAXSIZE]
+************************************************************/
 int httpWriteMsgToSocket(int iSocketFd)
 {
     int iBytesCurrentlyProcessed = 0;
@@ -506,7 +530,11 @@ int httpWriteMsgToSocket(int iSocketFd)
     
     do
     {
-        iBytesCurrentlyProcessed = write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
+        #if USESSL == 1
+            iBytesCurrentlyProcessed = SSL_write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
+        #else
+            iBytesCurrentlyProcessed = write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
+        #endif
         if(iBytesCurrentlyProcessed < 0)
         {
             printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
@@ -523,6 +551,10 @@ int httpWriteMsgToSocket(int iSocketFd)
     return 0;
 }
 
+/************ int httpReadRespFromSocket ********************
+    Uses the buffer: 
+    char msHttpRxMessage[HTTPMSGMAXSIZE]
+************************************************************/
 int httpReadRespFromSocket(int iSocketFd)
 {
     int iBytesReceived = 0; 
@@ -532,7 +564,11 @@ int httpReadRespFromSocket(int iSocketFd)
     memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage)); // clear buffer
     do
     {
-        iBytesCurrentlyProcessed = read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
+        #if USESSL == 1
+            iBytesCurrentlyProcessed = SSL_read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
+        #else
+            iBytesCurrentlyProcessed = read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
+        #endif    
         if(iBytesCurrentlyProcessed < 0)
         {
             printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
