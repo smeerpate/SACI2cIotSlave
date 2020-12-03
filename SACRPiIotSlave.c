@@ -530,7 +530,7 @@ int httpSendRequest()
     
     /* show the stuff that we have received */
     printBytesAsHexString((uint32_t)msHttpRxMessage, iBytesReceived, 1, ", ");
-    printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n\t%s\n", getTimestamp(), __func__, iBytesReceived, msHttpRxMessage);
+    printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n%s\n", getTimestamp(), __func__, iBytesReceived, msHttpRxMessage);
     
     close(miHttpSocketFd);
     return 0;
@@ -556,7 +556,9 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     
     msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\n\r\n";
     //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", sUpstreamMsg);
-    sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", "deadbeefdeadbeef");
+    //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", "deadbeefdeadbeef");
+    
+    sprintf(msHttpTxMessage, "%s\r\n%s\r\n%s\r\n\r\n", "GET /mobile/webhook?id=SC-4GTEST&time=1594998140&seqNumber=207&ack=1&data=deadbeefdeadbeef HTTP/1.1", "Host: dashboard.safeandclean.be", "User-Agent: Mozilla/5.0 (en-us)");
 }
 
 
