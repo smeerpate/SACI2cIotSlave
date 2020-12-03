@@ -572,11 +572,11 @@ char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator
     {
         if(addSeparator)
         {
-            sprintf(sParsedByte, "%02x", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)));
+            sprintf(sParsedByte, "%02x", *((char *)(startAddress + iBytesCurrentlyProcessed)));
         }
         else
         {
-            sprintf(sParsedByte, "%02x%s", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)), separator);
+            sprintf(sParsedByte, "%02x%s", *((char *)(startAddress + iBytesCurrentlyProcessed)), separator);
         }
         strcat(msGenericStringBuffer, sParsedByte);
         iBytesCurrentlyProcessed += 1;
