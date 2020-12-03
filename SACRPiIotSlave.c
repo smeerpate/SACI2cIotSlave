@@ -17,7 +17,7 @@
         https://stackoverflow.com/questions/22077802/simple-c-example-of-doing-an-http-post-and-consuming-the-response
         
     Compile:
-        gcc -Wall -pthread -o SACRPiIotSlave SACRPiIotSlave.c -lpigpio -lrt -lssl
+        gcc -Wall -pthread -o SACRPiIotSlave SACRPiIotSlave.c -lpigpio -lrt -lssl -lcrypto
 */
 
 #include <pigpio.h>
@@ -47,7 +47,7 @@
 #define HTTPMSGMAXSIZE          4096
 #define GENERICSTRBUFFERSIZE    256
 
-#define USESSL                  1
+#define USESSL                  0
 
 typedef union
 {
