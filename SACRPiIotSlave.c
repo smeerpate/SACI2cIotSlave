@@ -530,7 +530,7 @@ int httpSendRequest()
     
     /* show the stuff that we have received */
     printBytesAsHexString((uint32_t)msHttpRxMessage, iBytesReceived, 1, ", ");
-    printf("[INFO] (%s) %s: %i http request message bytes received in socket: %s\n", getTimestamp(), __func__, iBytesReceived, msGenericStringBuffer);
+    printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n\t%s\n", getTimestamp(), __func__, iBytesReceived, msGenericStringBuffer);
     
     close(miHttpSocketFd);
     return 0;
