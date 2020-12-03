@@ -422,7 +422,7 @@ int httpSocketInit()
 {
     /* first what are we going to send and where are we going to send it? */
     /* send a post to:
-        https://dashboard.safeandclean.be/http/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
+        https://dashboard.safeandclean.be/mobile/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
     */
     miHttpPortNo = 80;
     msHttpHost = "dashboard.safeandclean.be";
@@ -466,6 +466,9 @@ int httpSendRequest()
     int iBytesSent = 0;
     int iBytesReceived = 0;
     int iBytesCurrentlyProcessed;
+    
+    /* initialize the socket */
+    httpSocketInit();
     
     /* connect the socket */
     int iResult;
@@ -549,7 +552,6 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 
 int main(int argc, char* argv[]){
     signal(SIGINT, SIGHandler);
-    httpSocketInit();
     runSlave();
     closeSlave();
     return 0;
