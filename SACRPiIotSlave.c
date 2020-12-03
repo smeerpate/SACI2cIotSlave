@@ -501,7 +501,7 @@ int httpSendRequest()
         iBytesSent += iBytesCurrentlyProcessed;
     } while(iBytesSent < iBytesToProcess);
     
-    printf("[INFO] (%s) %s: %i http request message bytes written to socket: %s\n", getTimestamp(), __func__, iBytesSent, msHttpTxMessage);
+    printf("[INFO] (%s) %s: %i http request message bytes written to socket:\n%s\n", getTimestamp(), __func__, iBytesSent, msHttpTxMessage);
     
     /* receive the response */
     iBytesCurrentlyProcessed = 0;
