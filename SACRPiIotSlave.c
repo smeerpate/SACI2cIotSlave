@@ -40,6 +40,7 @@
 #define IOTETX                  '\n'
 
 #define HTTPMSGMAXSIZE          512
+#define GENERICSTRBUFFERSIZE    256
 
 typedef union
 {
@@ -113,7 +114,7 @@ tSmState sState = S_IDLE;
 uint8_t mabUpstreamDataBuffer[UPSTREAMBUFFERSIZE] = {0x00};
 uint8_t mabDownstreamDataBuffer[DOWNSTREAMBUFFERSIZE] = {0x00};
 time_t sRawTime;
-char sTimeStamp[32] = {0x00};
+char msGenericStringBuffer[GENERICSTRBUFFERSIZE] = {0x00};
 
 char *msHttpHost;
 int miHttpPortNo;
@@ -139,6 +140,7 @@ void SIGHandler(int signum);
 int httpSocketInit();
 int httpSendRequest();
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
+char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator)
 /****************************************************/
 
 
@@ -344,7 +346,9 @@ void listeningTask()
     
 }
 
-
+/*
+    Makes use of and overwrites the msGenericStringBuffer.
+*/
 char* getTimestamp()
 {
     
@@ -352,8 +356,8 @@ char* getTimestamp()
     sRawTime = time(NULL);
     
     tm_info = localtime(&sRawTime);
-    strftime(sTimeStamp, 26, "%Y-%m-%d %H:%M:%S", tm_info);
-    return sTimeStamp;
+    strftime(msGenericStringBuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    return msGenericStringBuffer;
 }
 
 float getTickSec()
@@ -524,6 +528,10 @@ int httpSendRequest()
         return -1;
     }
     
+    /* show the stuff that we have received */
+    printBytesAsHexString((uint32_t)msHttpRxMessage, iBytesReceived, 1, ", ");
+    printf("[INFO] (%s) %s: %i http request message bytes received in socket: %s\n", getTimestamp(), __func__, iBytesReceived, msGenericStringBuffer);
+    
     close(miHttpSocketFd);
     return 0;
 }
@@ -550,6 +558,37 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", sUpstreamMsg);
 }
 
+
+/****************** printBytesAsHexString *******************
+    Makes use of and overwrites the msGenericStringBuffer.
+    return a pointer to the msGenericStringBuffer.
+************************************************************/
+char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator)
+{
+    char sParsedByte[GENERICSTRBUFFERSIZE] = {0x00};
+    int iBytesCurrentlyProcessed = 0;
+    
+    do
+    {
+        if(addSeparator)
+        {
+            sprintf(sParsedByte, "%02x", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)));
+        }
+        else
+        {
+            sprintf(sParsedByte, "%02x%s", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)), separator);
+        }
+        strcat(msGenericStringBuffer, sParsedByte);
+        iBytesCurrentlyProcessed += 1;
+    } while(iBytesCurrentlyProcessed < length);
+    
+    return msGenericStringBuffer;
+}
+
+/*************************************************************************************************/
+/*************************** main ***************************
+    Program entry point
+************************************************************/
 int main(int argc, char* argv[]){
     signal(SIGINT, SIGHandler);
     runSlave();
@@ -557,4 +596,4 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
-/****************************************************/
+/*************************************************************************************************/
