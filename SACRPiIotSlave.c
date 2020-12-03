@@ -558,7 +558,17 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", sUpstreamMsg);
     //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", "deadbeefdeadbeef");
     
-    sprintf(msHttpTxMessage, "%s\r\n%s\r\n%s\r\n\r\n", "GET /mobile/webhook?id=SC-4GTEST&time=1594998140&seqNumber=207&ack=1&data=deadbeefdeadbeef HTTP/1.1", "Host: dashboard.safeandclean.be", "User-Agent: Mozilla/5.0 (en-us)");
+    sprintf(msHttpTxMessage, "%s\r\n", 
+        "GET /mobile/webhook?id=SC-4GTEST&time=1594998140&seqNumber=207&ack=1&data=deadbeefdeadbeef HTTP/1.1\r\n"
+        "Host: dashboard.safeandclean.be\r\n"
+        "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0\r\n"
+        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n"
+        "Accept-Language: nl,en-US;q=0.7,en;q=0.3\r\n"
+        "Accept-Encoding: gzip, deflate, br\r\n"
+        "Connection: keep-alive\r\n"
+        "Upgrade-Insecure-Requests: 1\r\n"
+        "Cache-Control: max-age=0\r\n"
+        );
 }
 
 
