@@ -30,7 +30,7 @@
 #include <netdb.h> /* struct hostent, gethostbyname */
 #include <signal.h>
 #include <errno.h>
-#include <openssl/ssl.h> /* for https */
+#include <openssl/ssl.h> /* for https, if not installed: "sudo apt-get install libssl-dev" */
 
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
@@ -145,8 +145,8 @@ void SIGHandler(int signum);
 
 int httpSocketInit();
 int httpSendRequest();
-void httpWriteMsgToSocket(int iSocketFd);
-void httpReadRespFromSocket(int iSocketFd);
+int httpWriteMsgToSocket(int iSocketFd);
+int httpReadRespFromSocket(int iSocketFd);
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
 char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
 void sslInit();
@@ -498,7 +498,7 @@ int httpSendRequest()
     return 0;
 }
 
-void httpWriteMsgToSocket(int iSocketFd)
+int httpWriteMsgToSocket(int iSocketFd)
 {
     int iBytesCurrentlyProcessed = 0;
     int iBytesToProcess = strlen(msHttpTxMessage);
@@ -520,9 +520,10 @@ void httpWriteMsgToSocket(int iSocketFd)
     } while(iBytesSent < iBytesToProcess);
     
     printf("[INFO] (%s) %s: %i http request message bytes written to socket:\n%s\n", getTimestamp(), __func__, iBytesSent, msHttpTxMessage);
+    return 0;
 }
 
-void httpReadRespFromSocket(int iSocketFd)
+int httpReadRespFromSocket(int iSocketFd)
 {
     int iBytesReceived = 0; 
     int iBytesCurrentlyProcessed = 0;
@@ -553,6 +554,7 @@ void httpReadRespFromSocket(int iSocketFd)
     /* show the stuff that we have received */
     printBytesAsHexString((uint32_t)msHttpRxMessage, iBytesReceived, 1, ", ");
     printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n%s\n", getTimestamp(), __func__, iBytesReceived, msHttpRxMessage);
+    return 0;
 }
 
 /******************* httpBuildRequestMsg *******************
