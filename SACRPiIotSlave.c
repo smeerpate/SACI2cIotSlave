@@ -466,6 +466,15 @@ int httpSendRequest()
     int iBytesReceived = 0;
     int iBytesCurrentlyProcessed;
     
+    /* connect the socket */
+    int iResult;
+    iResult = connect(miHttpSocketFd, (struct sockaddr *)&msHttpServerAddr, sizeof(msHttpServerAddr));
+    if (iResult < 0)
+    {
+        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iResult);
+        return -1;
+    }
+        
     /* send the request */
     iBytesCurrentlyProcessed = 0;
     do
