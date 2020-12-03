@@ -30,6 +30,7 @@
 #include <netdb.h> /* struct hostent, gethostbyname */
 #include <signal.h>
 #include <errno.h>
+#include <openssl/ssl.h> /* for https */
 
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
@@ -41,6 +42,8 @@
 
 #define HTTPMSGMAXSIZE          4096
 #define GENERICSTRBUFFERSIZE    256
+
+#define USESSL                  1
 
 typedef union
 {
@@ -124,6 +127,8 @@ struct sockaddr_in msHttpServerAddr;
 int miHttpSocketFd;
 char msHttpTxMessage[HTTPMSGMAXSIZE] = {0x00};
 char msHttpRxMessage[HTTPMSGMAXSIZE] = {0x00};
+
+SSL_CTX *sSSLContext;
 /****************************************************/
 
 
@@ -137,10 +142,14 @@ float getTickSec();
 int getControlBits(int, bool);
 void closeSlave();
 void SIGHandler(int signum);
+
 int httpSocketInit();
 int httpSendRequest();
+void httpWriteMsgToSocket(int iSocketFd);
+void httpReadRespFromSocket(int iSocketFd);
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
 char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
+void sslInit();
 /****************************************************/
 
 
@@ -466,11 +475,6 @@ int httpSocketInit()
 ************************************************************/
 int httpSendRequest()
 {
-    int iBytesToProcess = strlen(msHttpTxMessage);
-    int iBytesSent = 0;
-    int iBytesReceived = 0;
-    int iBytesCurrentlyProcessed;
-    
     /* initialize the socket */
     httpSocketInit();
     
@@ -485,10 +489,24 @@ int httpSendRequest()
     }
         
     /* send the request */
-    iBytesCurrentlyProcessed = 0;
+    httpWriteMsgToSocket(miHttpSocketFd);
+    
+    /* receive the response */
+    httpReadRespFromSocket(miHttpSocketFd);
+    
+    close(miHttpSocketFd);
+    return 0;
+}
+
+void httpWriteMsgToSocket(int iSocketFd)
+{
+    int iBytesCurrentlyProcessed = 0;
+    int iBytesToProcess = strlen(msHttpTxMessage);
+    int iBytesSent = 0;
+    
     do
     {
-        iBytesCurrentlyProcessed = write(miHttpSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
+        iBytesCurrentlyProcessed = write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
         if(iBytesCurrentlyProcessed < 0)
         {
             printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
@@ -502,14 +520,18 @@ int httpSendRequest()
     } while(iBytesSent < iBytesToProcess);
     
     printf("[INFO] (%s) %s: %i http request message bytes written to socket:\n%s\n", getTimestamp(), __func__, iBytesSent, msHttpTxMessage);
+}
+
+void httpReadRespFromSocket(int iSocketFd)
+{
+    int iBytesReceived = 0; 
+    int iBytesCurrentlyProcessed = 0;
+    int iBytesToProcess = sizeof(msHttpRxMessage) - 1;
     
-    /* receive the response */
-    iBytesCurrentlyProcessed = 0;
     memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage)); // clear buffer
-    iBytesToProcess = sizeof(msHttpRxMessage) - 1;
     do
     {
-        iBytesCurrentlyProcessed = read(miHttpSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
+        iBytesCurrentlyProcessed = read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
         if(iBytesCurrentlyProcessed < 0)
         {
             printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
@@ -531,9 +553,6 @@ int httpSendRequest()
     /* show the stuff that we have received */
     printBytesAsHexString((uint32_t)msHttpRxMessage, iBytesReceived, 1, ", ");
     printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n%s\n", getTimestamp(), __func__, iBytesReceived, msHttpRxMessage);
-    
-    close(miHttpSocketFd);
-    return 0;
 }
 
 /******************* httpBuildRequestMsg *******************
@@ -599,12 +618,23 @@ char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator
     return msGenericStringBuffer;
 }
 
+void sslInit()
+{
+    // initialize OpenSSL - do this once and stash ssl_ctx in a global var
+    SSL_load_error_strings();
+    SSL_library_init();
+    sSSLContext = SSL_CTX_new(SSLv23_client_method());
+}
+
 /*************************************************************************************************/
 /*************************** main ***************************
     Program entry point
 ************************************************************/
 int main(int argc, char* argv[]){
     signal(SIGINT, SIGHandler);
+    #if USESSL == 1
+        sslInit();
+    #endif
     runSlave();
     closeSlave();
     return 0;
