@@ -39,7 +39,7 @@
 #define IOTSTX                  '#'
 #define IOTETX                  '\n'
 
-#define HTTPMSGMAXSIZE          512
+#define HTTPMSGMAXSIZE          4096
 #define GENERICSTRBUFFERSIZE    256
 
 typedef union
@@ -554,7 +554,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         iBytesCurrentlyProcessed += 1;
     } while(iBytesCurrentlyProcessed < UPSTREAMBUFFERSIZE);
     
-    msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
+    msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\n\r\n";
     //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", sUpstreamMsg);
     sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", "deadbeefdeadbeef");
 }
