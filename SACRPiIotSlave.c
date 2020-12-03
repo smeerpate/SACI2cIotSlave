@@ -424,7 +424,7 @@ int httpSocketInit()
         https://dashboard.safeandclean.be/http/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
     */
     miHttpPortNo = 80;
-    msHttpHost = "dashboard.safeandclean.be/mobile";
+    msHttpHost = "dashboard.safeandclean.be";
     
     /* create the http socket */
     miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -532,7 +532,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         iBytesCurrentlyProcessed += 1;
     } while(iBytesCurrentlyProcessed < UPSTREAMBUFFERSIZE);
     
-    msHttpMsgFmt = "GET /webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
+    msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.0\r\n\r\n";
     sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", sUpstreamMsg);
 }
 
