@@ -148,8 +148,8 @@ void SIGHandler(int signum);
 
 int httpSocketInit();
 int httpSendRequest();
-int httpWriteMsgToSocket(int iSocketFd);
-int httpReadRespFromSocket(int iSocketFd);
+int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
+int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
 char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
 void sslInit();
@@ -503,15 +503,18 @@ int httpSendRequest()
         return -1;
     }
     #endif
-        
-    /* send the request */
-    httpWriteMsgToSocket(miHttpSocketFd);
-    
-    /* receive the response */
-    httpReadRespFromSocket(miHttpSocketFd);
     
     #if USESSL == 1
+        /* send the request */
+        httpWriteMsgToSocket(NULL, sSSLConn);
+        /* receive the response */
+        httpReadRespFromSocket(NULL, sSSLConn);
         SSL_shutdown(sSSLConn);
+    #else
+        /* send the request */
+        httpWriteMsgToSocket(miHttpSocketFd, NULL);
+        /* receive the response */
+        httpReadRespFromSocket(miHttpSocketFd, NULL);
     #endif
     
     close(miHttpSocketFd);
@@ -522,7 +525,7 @@ int httpSendRequest()
     Uses the buffer: 
     char msHttpTxMessage[HTTPMSGMAXSIZE]
 ************************************************************/
-int httpWriteMsgToSocket(int iSocketFd)
+int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn)
 {
     int iBytesCurrentlyProcessed = 0;
     int iBytesToProcess = strlen(msHttpTxMessage);
@@ -531,7 +534,7 @@ int httpWriteMsgToSocket(int iSocketFd)
     do
     {
         #if USESSL == 1
-            iBytesCurrentlyProcessed = SSL_write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
+            iBytesCurrentlyProcessed = SSL_write(sSSLConn, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
         #else
             iBytesCurrentlyProcessed = write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
         #endif
@@ -555,7 +558,7 @@ int httpWriteMsgToSocket(int iSocketFd)
     Uses the buffer: 
     char msHttpRxMessage[HTTPMSGMAXSIZE]
 ************************************************************/
-int httpReadRespFromSocket(int iSocketFd)
+int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
 {
     int iBytesReceived = 0; 
     int iBytesCurrentlyProcessed = 0;
@@ -565,7 +568,7 @@ int httpReadRespFromSocket(int iSocketFd)
     do
     {
         #if USESSL == 1
-            iBytesCurrentlyProcessed = SSL_read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
+            iBytesCurrentlyProcessed = SSL_read(sSSLConn, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
         #else
             iBytesCurrentlyProcessed = read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
         #endif    
