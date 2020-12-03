@@ -34,6 +34,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <openssl/ssl.h> /* for https, if not installed: "sudo apt-get install libssl-dev" */
+#include <openssl/err.h>
 
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
@@ -495,11 +496,14 @@ int httpSendRequest()
     // create an SSL connection and attach it to the socket
     SSL *sSSLConn = SSL_new(sSSLContext);
     SSL_set_fd(sSSLConn, miHttpSocketFd);
+    ERR_clear_error(); // clear error queue
     iResult = SSL_connect(sSSLConn);
     if (iResult != 1)
     {
+        unsigned int uiSSLError = ERR_get_error();
+        ERR_error_string(ERR_get_error(), NULL);
         int iErrsv = SSL_get_error(sSSLConn, iResult);
-        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n", getTimestamp(), __func__, iErrsv, iResult);
+        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", getTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL););
         return -1;
     }
     #endif
