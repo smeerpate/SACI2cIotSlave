@@ -556,7 +556,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     
     msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\n\r\n";
     //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", sUpstreamMsg);
-    sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", "deadbeefdeadbeef");
+    sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", "deadbeefdeadbeef");
 }
 
 
