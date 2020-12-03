@@ -29,6 +29,7 @@
 #include <netinet/in.h> /* struct sockaddr_in, struct sockaddr */
 #include <netdb.h> /* struct hostent, gethostbyname */
 #include <signal.h>
+#include <errno.h>
 
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
@@ -471,7 +472,8 @@ int httpSendRequest()
     iResult = connect(miHttpSocketFd, (struct sockaddr *)&msHttpServerAddr, sizeof(msHttpServerAddr));
     if (iResult < 0)
     {
-        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iResult);
+        int iErrsv = errno;
+        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iErrsv);
         return -1;
     }
         
