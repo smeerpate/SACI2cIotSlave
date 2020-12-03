@@ -500,10 +500,8 @@ int httpSendRequest()
     iResult = SSL_connect(sSSLConn);
     if (iResult != 1)
     {
-        unsigned int uiSSLError = ERR_get_error();
-        ERR_error_string(ERR_get_error(), NULL);
         int iErrsv = SSL_get_error(sSSLConn, iResult);
-        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", getTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL););
+        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", getTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
         return -1;
     }
     #endif
