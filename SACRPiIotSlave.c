@@ -499,7 +499,7 @@ int httpSendRequest()
     if (iResult != 1)
     {
         int iErrsv = errno;
-        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iErrsv);
+        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i.\n", getTimestamp(), __func__, iErrsv);
         return -1;
     }
     #endif
