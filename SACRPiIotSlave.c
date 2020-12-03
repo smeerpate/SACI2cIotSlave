@@ -506,9 +506,9 @@ int httpSendRequest()
     
     #if USESSL == 1
         /* send the request */
-        httpWriteMsgToSocket(NULL, sSSLConn);
+        httpWriteMsgToSocket(0, sSSLConn);
         /* receive the response */
-        httpReadRespFromSocket(NULL, sSSLConn);
+        httpReadRespFromSocket(0, sSSLConn);
         SSL_shutdown(sSSLConn);
     #else
         /* send the request */
