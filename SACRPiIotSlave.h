@@ -7,8 +7,6 @@
 #define IOTSTX                  '#'
 #define IOTETX                  '\n'
 
-#define GENERICSTRBUFFERSIZE    256
-
 
 typedef union
 {

@@ -51,7 +51,6 @@ typedef struct
 bsc_xfer_t sI2cTransfer; // i2c transfer struct
 volatile tBscStatus sI2cStatus;
 tSmState sState = S_IDLE;
-char msGenericStringBuffer[GENERICSTRBUFFERSIZE] = {0x00};
 /****************************************************/
 
 
@@ -345,35 +344,6 @@ void SIGHandler(int signum)
     closeSlave();
     exit(signum);
 }
-
-
-/****************** printBytesAsHexString *******************
-    Makes use of and overwrites the msGenericStringBuffer.
-    return a pointer to the msGenericStringBuffer.
-************************************************************/
-char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator)
-{
-    char sParsedByte[GENERICSTRBUFFERSIZE] = {0x00};
-    memset((void *)msGenericStringBuffer, 0x00, GENERICSTRBUFFERSIZE);
-    int iBytesCurrentlyProcessed = 0;
-    
-    do
-    {
-        if(!addSeparator)
-        {
-            sprintf(sParsedByte, "%02x", *((char *)(startAddress + iBytesCurrentlyProcessed)));
-        }
-        else
-        {
-            sprintf(sParsedByte, "%02x%s", *((char *)(startAddress + iBytesCurrentlyProcessed)), separator);
-        }
-        strcat(msGenericStringBuffer, sParsedByte);
-        iBytesCurrentlyProcessed += 1;
-    } while(iBytesCurrentlyProcessed < length);
-    
-    return msGenericStringBuffer;
-}
-
 /*************************************************************************************************/
 
 /*************************** main ***************************

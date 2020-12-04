@@ -10,7 +10,6 @@
 int httpSocketInit();
 int httpSendRequest();
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
-char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
 void sslInit();
 void sslClose();
 
