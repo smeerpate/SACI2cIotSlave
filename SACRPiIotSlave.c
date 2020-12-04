@@ -33,6 +33,7 @@
 #include "SACRPiIotSlave.h"
 #include "SACServerComms.h"
 #include "SACPrintUtils.h"
+#include "SACStructs.h"
 
 /********************** Globals *********************/
 uint32_t uSleepMicrosec = 1000; // number of micro seconds to sleep if no i2c transaction received. 32bytes take about 3.2ms to transmit.
@@ -116,11 +117,10 @@ void runSlave()
 
 void listeningTask()
 {
-    uint8_t bPayloadSize;
-    uint8_t *pPayload;
     uint8_t bEtx;
-    static uint8_t bErrorResponse = 0x00;
-    static uint8_t bLastDownLinkIndicatorCode = 0xFF;
+    static uint8_t bErrorResponse = 0x00;   
+    tCtrlSendCmd *pLastSendCommand = getLastSendCmd(); // get the address of the last saved send command
+    
     // Protocol state machine.
     // update the transfer struct and get the peripheral status.
     switch (sState)
@@ -145,8 +145,8 @@ void listeningTask()
         case S_PARSEIOTHEADER:
             printf("[INFO] (%s) %s: Parsing IoT header...\n", printTimestamp(), __func__);
             tIotCmdHeader* pIotCmdHeader = (tIotCmdHeader*)sI2cTransfer.rxBuf;
-            printf("\t#(%f) IoT header: stx=0x%02x, cmdCode=0x%02x\n", getTickSec(), pIotCmdHeader->stx, pIotCmdHeader->cmdCode);
-            if(pIotCmdHeader->stx == IOTSTX)
+            printf("\t#(%f) IoT header: stx=0x%02x, cmdCode=0x%02x\n", getTickSec(), pIotCmdHeader->startTag, pIotCmdHeader->cmdCode);
+            if(pIotCmdHeader->startTag == IOT_FRMSTARTTAG)
             {
                 // stx is correct proceed to command code
                 switch(pIotCmdHeader->cmdCode)
@@ -179,14 +179,11 @@ void listeningTask()
             sState = S_IDLE;
             break;
             
-        case S_PARSECMDSEND:
-            bPayloadSize = sI2cTransfer.rxBuf[2];
-            pPayload = (uint8_t *)&sI2cTransfer.rxBuf[4];
-            bEtx = *(pPayload + bPayloadSize - 1);
-            printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, bPayloadSize, (uint32_t)pPayload, bEtx);
-            // save rx command status
-            bLastDownLinkIndicatorCode = sI2cTransfer.rxBuf[3];
-            if (bEtx == IOTETX)
+        case S_PARSECMDSEND:            
+            pLastSendCommand = setLastSendCmd((void *)&sI2cTransfer.rxBuf[0]);
+            printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, pLastSendCommand->payloadSize, (uint32_t)pLastSendCommand->payload, pLastSendCommand->endTag);
+
+            if (pLastSendCommand->endTag == IOT_FRMENDTAG)
             {
                 // received correct ETX
                 bErrorResponse = 0x00;
@@ -194,7 +191,7 @@ void listeningTask()
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
                 bscXfer(&sI2cTransfer);
                 // try to send http request with payload
-                httpBuildRequestMsg((uint32_t)pPayload, bPayloadSize);
+                httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize);
                 httpSendRequest();
                 // tell master were back
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
@@ -219,21 +216,21 @@ void listeningTask()
             
 
         case S_BUILDRESPONSE:
-            printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", printTimestamp(), __func__, bLastDownLinkIndicatorCode, bErrorResponse);
-            switch(bLastDownLinkIndicatorCode)
+            printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator, bErrorResponse);
+            switch(pLastSendCommand->downlinkIndicator)
             {
                 case 0x00:
                     // Master did not ask for downlink data. Only send Error code.
-                    sI2cTransfer.txBuf[0] = IOTSTX;
+                    sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = bErrorResponse;
                     sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
-                    sI2cTransfer.txBuf[4] = IOTETX;
+                    sI2cTransfer.txBuf[4] = IOT_FRMENDTAG;
                     sI2cTransfer.txCnt = 5;
                     break;
                 case 0x01:
                     // Master DID ask for downlink data.
-                    sI2cTransfer.txBuf[0] = IOTSTX;
+                    sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = bErrorResponse;
                     sI2cTransfer.txBuf[3] = 0x08;
@@ -245,17 +242,17 @@ void listeningTask()
                     sI2cTransfer.txBuf[9] = 0xEF;
                     sI2cTransfer.txBuf[10] = 0xBE;
                     sI2cTransfer.txBuf[11] = 0xEF;
-                    sI2cTransfer.txBuf[12] = IOTETX;
+                    sI2cTransfer.txBuf[12] = IOT_FRMENDTAG;
                     sI2cTransfer.txCnt = 13;
                     break;
                 default:
                     // unknown response code
                     printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, sI2cTransfer.rxBuf[3]);
-                    sI2cTransfer.txBuf[0] = IOTSTX;
+                    sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = 0x03;
                     sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
-                    sI2cTransfer.txBuf[4] = IOTETX;
+                    sI2cTransfer.txBuf[4] = IOT_FRMENDTAG;
                     sI2cTransfer.txCnt = 5;
                     break;
             }
@@ -351,6 +348,7 @@ void SIGHandler(int signum)
 ************************************************************/
 int main(int argc, char* argv[]){
     signal(SIGINT, SIGHandler);
+    structsInit();
     #if USESSL == 1
         sslInit();
     #endif

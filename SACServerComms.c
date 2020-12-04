@@ -13,9 +13,13 @@
 #define UPSTREAMBUFFERSIZE      12
 #define DOWNSTREAMBUFFERSIZE    32
 
+/****************** private function prototypes *********************/
+int httpSocketInit();
 int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
 int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
+/********************************************************************/
 
+/******************** private global variables **********************/
 char *msHttpHost;
 int miHttpPortNo;
 char *msHttpMsgFmt;
@@ -25,8 +29,65 @@ int miHttpSocketFd;
 char msHttpTxMessage[HTTPMSGMAXSIZE] = {0x00};
 char msHttpRxMessage[HTTPMSGMAXSIZE] = {0x00};
 SSL_CTX *sSSLContext;
+/********************************************************************/
 
 
+/************** int httpSendRequest() *********************
+    Sends a http request stored in
+    msHttpTxMessage[HTTPMSGMAXSIZE] and sebsequently
+    receives the response into 
+    msHttpRxMessage[HTTPMSGMAXSIZE]
+************************************************************/
+int httpSendRequest()
+{
+    /* initialize the socket */
+    httpSocketInit();
+    
+    /* connect the socket */
+    int iResult;
+    iResult = connect(miHttpSocketFd, (struct sockaddr *)&msHttpServerAddr, sizeof(msHttpServerAddr));
+    if (iResult < 0)
+    {
+        int iErrsv = errno;
+        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", printTimestamp(), __func__, miHttpSocketFd, iErrsv);
+        return -1;
+    }
+    
+    #if USESSL == 1
+    // create an SSL connection and attach it to the socket
+    SSL *sSSLConn = SSL_new(sSSLContext);
+    SSL_set_fd(sSSLConn, miHttpSocketFd);
+    ERR_clear_error(); // clear error queue
+    iResult = SSL_connect(sSSLConn);
+    if (iResult != 1)
+    {
+        int iErrsv = SSL_get_error(sSSLConn, iResult);
+        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", printTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
+        return -1;
+    }
+    #endif
+    
+    #if USESSL == 1
+        /* send the request via SSL */
+        httpWriteMsgToSocket(0, sSSLConn);
+        /* receive the response via SSL */
+        httpReadRespFromSocket(0, sSSLConn);
+        SSL_shutdown(sSSLConn);
+    #else
+        /* send the request */
+        httpWriteMsgToSocket(miHttpSocketFd, NULL);
+        /* receive the response */
+        httpReadRespFromSocket(miHttpSocketFd, NULL);
+    #endif
+    
+    close(miHttpSocketFd);
+    return 0;
+}
+
+
+/******************* httpSocketInit *************************
+
+************************************************************/
 int httpSocketInit()
 {
     /* first what are we going to send and where are we going to send it? */
@@ -65,57 +126,6 @@ int httpSocketInit()
     
     printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", printTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
     
-    return 0;
-}
-
-/************** int httpSendRequest() *********************
-    Uses the buffers 
-    char msHttpTxMessage[HTTPMSGMAXSIZE]
-    char msHttpRxMessage[HTTPMSGMAXSIZE]
-************************************************************/
-int httpSendRequest()
-{
-    /* initialize the socket */
-    httpSocketInit();
-    
-    /* connect the socket */
-    int iResult;
-    iResult = connect(miHttpSocketFd, (struct sockaddr *)&msHttpServerAddr, sizeof(msHttpServerAddr));
-    if (iResult < 0)
-    {
-        int iErrsv = errno;
-        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", printTimestamp(), __func__, miHttpSocketFd, iErrsv);
-        return -1;
-    }
-    
-    #if USESSL == 1
-    // create an SSL connection and attach it to the socket
-    SSL *sSSLConn = SSL_new(sSSLContext);
-    SSL_set_fd(sSSLConn, miHttpSocketFd);
-    ERR_clear_error(); // clear error queue
-    iResult = SSL_connect(sSSLConn);
-    if (iResult != 1)
-    {
-        int iErrsv = SSL_get_error(sSSLConn, iResult);
-        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", printTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
-        return -1;
-    }
-    #endif
-    
-    #if USESSL == 1
-        /* send the request */
-        httpWriteMsgToSocket(0, sSSLConn);
-        /* receive the response */
-        httpReadRespFromSocket(0, sSSLConn);
-        SSL_shutdown(sSSLConn);
-    #else
-        /* send the request */
-        httpWriteMsgToSocket(miHttpSocketFd, NULL);
-        /* receive the response */
-        httpReadRespFromSocket(miHttpSocketFd, NULL);
-    #endif
-    
-    close(miHttpSocketFd);
     return 0;
 }
 
@@ -235,6 +245,9 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         
 }
 
+/*********************** sslInit ****************************
+
+************************************************************/
 void sslInit()
 {
     // initialize OpenSSL - do this once and stash ssl_ctx in a global var
@@ -243,6 +256,9 @@ void sslInit()
     sSSLContext = SSL_CTX_new(SSLv23_client_method());
 }
 
+/*********************** sslClose ***************************
+
+************************************************************/
 void sslClose()
 {
     return;

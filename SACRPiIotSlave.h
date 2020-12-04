@@ -4,9 +4,6 @@
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
 
-#define IOTSTX                  '#'
-#define IOTETX                  '\n'
-
 
 typedef union
 {
@@ -26,28 +23,6 @@ typedef union
     int32_t i32;
 } tBscStatus;
 
-typedef struct
-{
-    uint8_t stx;
-    uint8_t cmdCode;
-} tIotCmdHeader;
-
-typedef struct
-{
-    tIotCmdHeader header;
-    uint8_t payloadSize;
-    uint8_t payload[32];
-    uint8_t enDownlink;
-    uint8_t etx;
-} tIotCmdSend;
-
-typedef struct
-{
-    tIotCmdHeader header;
-    uint8_t cmdCode;
-    uint8_t spare;
-    uint8_t etx;
-} tIotCmdReadEnable;
 
 typedef enum
 {
