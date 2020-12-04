@@ -46,6 +46,7 @@
 
 #define HTTPMSGMAXSIZE          4096
 #define GENERICSTRBUFFERSIZE    256
+#define TIMESTAMPBUFFERSIZE     64
 
 #define USESSL                  1
 
@@ -122,6 +123,7 @@ uint8_t mabUpstreamDataBuffer[UPSTREAMBUFFERSIZE] = {0x00};
 uint8_t mabDownstreamDataBuffer[DOWNSTREAMBUFFERSIZE] = {0x00};
 time_t sRawTime;
 char msGenericStringBuffer[GENERICSTRBUFFERSIZE] = {0x00};
+char msTimestampBuffer[TIMESTAMPBUFFERSIZE] = {0x00};
 
 char *msHttpHost;
 int miHttpPortNo;
@@ -141,7 +143,7 @@ uint8_t slave_init();
 void runSlave();
 void listeningTask();
 void closeSlave();
-char* getTimestamp();
+char* printTimestamp();
 float getTickSec();
 int getControlBits(int address, bool open, bool rxEnable);
 void closeSlave();
@@ -154,6 +156,7 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
 char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
 void sslInit();
+void sslClose();
 /****************************************************/
 
 
@@ -163,18 +166,18 @@ uint8_t slave_init()
     int iResult = gpioInitialise();
     if(iResult < 0)
     {
-        printf("[ERROR] (%s) %s: Error while initializing GPIOs. Return code = %i.\n", getTimestamp(), __func__, iResult);
+        printf("[ERROR] (%s) %s: Error while initializing GPIOs. Return code = %i.\n", printTimestamp(), __func__, iResult);
         exit(1);
     }
     else
     {
-        printf("[INFO] (%s) %s: Initialized GPIOs\n", getTimestamp(), __func__);
+        printf("[INFO] (%s) %s: Initialized GPIOs\n", printTimestamp(), __func__);
     }
     // Close old device (if any)
     sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false); // To avoid conflicts when restarting
     bscXfer(&sI2cTransfer);
     // Set I2C slave Address
-    printf("[INFO] (%s) %s: Setting I2C slave address to 0x%02x\n", getTimestamp(), __func__, I2CSALAVEADDRESS7);
+    printf("[INFO] (%s) %s: Setting I2C slave address to 0x%02x\n", printTimestamp(), __func__, I2CSALAVEADDRESS7);
     sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
     iResult = bscXfer(&sI2cTransfer); // Should now be visible in I2C-Scanners
     return iResult;
@@ -187,8 +190,8 @@ void runSlave()
     if(iStatus >= 0)
     {
         // Successfully opened i2c slave
-        printf("[INFO] (%s) %s: Successfully opened i2c slave. Status = %i.\n", getTimestamp(), __func__, iStatus);
-        printf("[INFO] (%s) %s: FIFO size is %i bytes\n", getTimestamp(), __func__, BSC_FIFO_SIZE);
+        printf("[INFO] (%s) %s: Successfully opened i2c slave. Status = %i.\n", printTimestamp(), __func__, iStatus);
+        printf("[INFO] (%s) %s: FIFO size is %i bytes\n", printTimestamp(), __func__, BSC_FIFO_SIZE);
         sI2cTransfer.rxCnt = 0;
         sI2cStatus.txBusy = 0;
         sI2cStatus.rxBusy = 0;
@@ -200,7 +203,7 @@ void runSlave()
     }
     else
     {
-       printf("[ERROR] (%s) %s: Failed opening i2c slave. Status = %i.\n", getTimestamp(), __func__, iStatus);
+       printf("[ERROR] (%s) %s: Failed opening i2c slave. Status = %i.\n", printTimestamp(), __func__, iStatus);
        exit(1);
     }
 }
@@ -227,17 +230,14 @@ void listeningTask()
             }
             else
             {
-                printf("[INFO] (%s) %s: Received %d bytes\n", getTimestamp(), __func__, sI2cTransfer.rxCnt);
-                for(int i=0; i < sI2cTransfer.rxCnt; i++)
-                {
-                    printf("\t#(%f) Byte %d : 0x%02x\n", getTickSec(), i, sI2cTransfer.rxBuf[i]);
-                }
+                printf("[INFO] (%s) %s: Received %d bytes\n", printTimestamp(), __func__, sI2cTransfer.rxCnt);
+                printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sI2cTransfer.rxBuf, sI2cTransfer.rxCnt, true, ", "));
                 sState = S_PARSEIOTHEADER;
             }
             break;
             
         case S_PARSEIOTHEADER:
-            printf("[INFO] (%s) %s: Parsing IoT header...\n", getTimestamp(), __func__);
+            printf("[INFO] (%s) %s: Parsing IoT header...\n", printTimestamp(), __func__);
             tIotCmdHeader* pIotCmdHeader = (tIotCmdHeader*)sI2cTransfer.rxBuf;
             printf("\t#(%f) IoT header: stx=0x%02x, cmdCode=0x%02x\n", getTickSec(), pIotCmdHeader->stx, pIotCmdHeader->cmdCode);
             if(pIotCmdHeader->stx == IOTSTX)
@@ -264,12 +264,12 @@ void listeningTask()
             break;
         
         case S_FLAGERROR_UNKNOWNCMD:
-            printf("[ERROR] (%s) %s: Unknown cmdCode\n", getTimestamp(), __func__);
+            printf("[ERROR] (%s) %s: Unknown cmdCode\n", printTimestamp(), __func__);
             sState = S_IDLE;
             break;
             
         case S_FLAGERROR_INVALIDSTX:
-            printf("[ERROR] (%s) %s: Invalid start of transmission (STX) code\n", getTimestamp(), __func__);
+            printf("[ERROR] (%s) %s: Invalid start of transmission (STX) code\n", printTimestamp(), __func__);
             sState = S_IDLE;
             break;
             
@@ -277,7 +277,7 @@ void listeningTask()
             bPayloadSize = sI2cTransfer.rxBuf[2];
             pPayload = (uint8_t *)&sI2cTransfer.rxBuf[4];
             bEtx = *(pPayload + bPayloadSize - 1);
-            printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", getTimestamp(), __func__, bPayloadSize, (uint32_t)pPayload, bEtx);
+            printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, bPayloadSize, (uint32_t)pPayload, bEtx);
             // save rx command status
             bLastDownLinkIndicatorCode = sI2cTransfer.rxBuf[3];
             if (bEtx == IOTETX)
@@ -307,13 +307,13 @@ void listeningTask()
            
         case S_PARSECMDREADENA:
             bEtx = sI2cTransfer.rxBuf[3];
-            printf("[INFO] (%s) %s: IoT read enable command: ETX = 0x%x\n", getTimestamp(), __func__, bEtx);
+            printf("[INFO] (%s) %s: IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, bEtx);
             sState = S_BUILDRESPONSE;
             break;
             
 
         case S_BUILDRESPONSE:
-            printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", getTimestamp(), __func__, bLastDownLinkIndicatorCode, bErrorResponse);
+            printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", printTimestamp(), __func__, bLastDownLinkIndicatorCode, bErrorResponse);
             switch(bLastDownLinkIndicatorCode)
             {
                 case 0x00:
@@ -344,7 +344,7 @@ void listeningTask()
                     break;
                 default:
                     // unknown response code
-                    printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", getTimestamp(), __func__, sI2cTransfer.rxBuf[3]);
+                    printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, sI2cTransfer.rxBuf[3]);
                     sI2cTransfer.txBuf[0] = IOTSTX;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = 0x03;
@@ -366,17 +366,17 @@ void listeningTask()
 }
 
 /*
-    Makes use of and overwrites the msGenericStringBuffer.
+    Makes use of and overwrites the msTimestampBuffer.
 */
-char* getTimestamp()
+char* printTimestamp()
 {
-    
+    memset((void *)msTimestampBuffer, 0x00, TIMESTAMPBUFFERSIZE);
     struct tm* tm_info;    
     sRawTime = time(NULL);
     
     tm_info = localtime(&sRawTime);
-    strftime(msGenericStringBuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
-    return msGenericStringBuffer;
+    strftime(msTimestampBuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    return msTimestampBuffer;
 }
 
 float getTickSec()
@@ -442,9 +442,9 @@ void closeSlave()
     gpioInitialise();
     sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false);
     bscXfer(&sI2cTransfer);
-    printf("[INFO] (%s) %s: Closed slave.\n", getTimestamp(), __func__);
+    printf("[INFO] (%s) %s: Closed slave.\n", printTimestamp(), __func__);
     gpioTerminate();
-    printf("[INFO] (%s) %s: Terminated GPIOs.\n", getTimestamp(), __func__);
+    printf("[INFO] (%s) %s: Terminated GPIOs.\n", printTimestamp(), __func__);
 }
 
 void SIGHandler(int signum)
@@ -472,7 +472,7 @@ int httpSocketInit()
     miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (miHttpSocketFd < 0)
     {
-        printf("[ERROR] (%s) %s: Failed to open socket\n", getTimestamp(), __func__);
+        printf("[ERROR] (%s) %s: Failed to open socket\n", printTimestamp(), __func__);
         return -1;
     }
     
@@ -480,7 +480,7 @@ int httpSocketInit()
     msHttpServer = gethostbyname(msHttpHost);
     if (msHttpServer == NULL) 
     {
-        printf("[ERROR] (%s) %s: No such host: %s\n", getTimestamp(), __func__, msHttpHost);
+        printf("[ERROR] (%s) %s: No such host: %s\n", printTimestamp(), __func__, msHttpHost);
         return -1;
     }
     
@@ -490,7 +490,7 @@ int httpSocketInit()
     msHttpServerAddr.sin_port = htons(miHttpPortNo);
     memcpy(&msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
     
-    printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", getTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
+    printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", printTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
     
     return 0;
 }
@@ -512,7 +512,7 @@ int httpSendRequest()
     if (iResult < 0)
     {
         int iErrsv = errno;
-        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iErrsv);
+        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", printTimestamp(), __func__, miHttpSocketFd, iErrsv);
         return -1;
     }
     
@@ -525,7 +525,7 @@ int httpSendRequest()
     if (iResult != 1)
     {
         int iErrsv = SSL_get_error(sSSLConn, iResult);
-        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", getTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
+        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", printTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
         return -1;
     }
     #endif
@@ -566,7 +566,7 @@ int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn)
         #endif
         if(iBytesCurrentlyProcessed < 0)
         {
-            printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
+            printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", printTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
             return -1;
         }
         if(iBytesCurrentlyProcessed == 0)
@@ -576,7 +576,13 @@ int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn)
         iBytesSent += iBytesCurrentlyProcessed;
     } while(iBytesSent < iBytesToProcess);
     
-    printf("[INFO] (%s) %s: %i http request message bytes written to socket:\n%s\n", getTimestamp(), __func__, iBytesSent, msHttpTxMessage);
+    printf("[INFO] (%s) %s: %i http request message bytes written to socket:\n"
+            "******* ASCII begin *******\n"
+            "%s\n"
+            "******** ASCII end ********\n"
+            , printTimestamp(), __func__, iBytesSent,
+            msHttpTxMessage
+            );
     return 0;
 }
 
@@ -600,7 +606,7 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
         #endif    
         if(iBytesCurrentlyProcessed < 0)
         {
-            printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", getTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
+            printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", printTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
             return -1;
         }
         if(iBytesCurrentlyProcessed == 0)
@@ -612,13 +618,19 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
     
     if(iBytesReceived == iBytesToProcess)
     {
-        printf("[ERROR] (%s) %s: Receive buffer ran out of space. Max. number of bytes: %i.\n", getTimestamp(), __func__, HTTPMSGMAXSIZE);
+        printf("[ERROR] (%s) %s: Receive buffer ran out of space. Max. number of bytes: %i.\n", printTimestamp(), __func__, HTTPMSGMAXSIZE);
         return -1;
     }
     
     /* show the stuff that we have received */
-    printBytesAsHexString((uint32_t)msHttpRxMessage, iBytesReceived, 1, ", ");
-    printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n%s\n", getTimestamp(), __func__, iBytesReceived, msHttpRxMessage);
+    
+    printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n"
+            "******* ASCII begin *******\n"
+            "%s\n"
+            "******** ASCII end ********\n"
+            , printTimestamp(), __func__, iBytesReceived,
+            msHttpRxMessage
+            );
     return 0;
 }
 
@@ -647,13 +659,6 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     sprintf(msHttpTxMessage, "%s\r\n", 
         "GET /mobile/webhook?id=SC-4GTEST&time=1594998140&seqNumber=207&ack=1&data=deadbeefdeadbeef HTTP/1.1\r\n"
         "Host: dashboard.safeandclean.be\r\n"
-        // "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0\r\n"
-        // "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n"
-        // "Accept-Language: nl,en-US;q=0.7,en;q=0.3\r\n"
-        // "Accept-Encoding: gzip, deflate, br\r\n"
-        // "Connection: keep-alive\r\n"
-        // "Upgrade-Insecure-Requests: 1\r\n"
-        // "Cache-Control: max-age=0\r\n"
         );
         
 }
@@ -666,11 +671,12 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator)
 {
     char sParsedByte[GENERICSTRBUFFERSIZE] = {0x00};
+    memset((void *)msGenericStringBuffer, 0x00, GENERICSTRBUFFERSIZE);
     int iBytesCurrentlyProcessed = 0;
     
     do
     {
-        if(addSeparator)
+        if(!addSeparator)
         {
             sprintf(sParsedByte, "%02x", *((char *)(startAddress + iBytesCurrentlyProcessed)));
         }
@@ -693,6 +699,11 @@ void sslInit()
     sSSLContext = SSL_CTX_new(SSLv23_client_method());
 }
 
+void sslClose()
+{
+    return;
+}
+
 /*************************************************************************************************/
 /*************************** main ***************************
     Program entry point
@@ -704,6 +715,7 @@ int main(int argc, char* argv[]){
     #endif
     runSlave();
     closeSlave();
+    sslClose();
     return 0;
 }
 
