@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #define HTTPMSGMAXSIZE          4096
+#define USESSL                  1
 
 int httpSocketInit();
 int httpSendRequest();

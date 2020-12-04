@@ -9,7 +9,6 @@
 
 #define GENERICSTRBUFFERSIZE    256
 
-#define USESSL                  1
 
 typedef union
 {
