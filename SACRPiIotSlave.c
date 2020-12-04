@@ -27,80 +27,12 @@
 #include "unistd.h"
 #include <stdarg.h>
 #include <stdbool.h>
-#include <time.h>
-#include <sys/socket.h> /* socket, connect */
-#include <netinet/in.h> /* struct sockaddr_in, struct sockaddr */
-#include <netdb.h> /* struct hostent, gethostbyname */
 #include <signal.h>
 #include <errno.h>
-#include <openssl/ssl.h> /* for https, if not installed: "sudo apt-get install libssl-dev" */
-#include <openssl/err.h>
 
-#define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
-#define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
-#define UPSTREAMBUFFERSIZE      12
-#define DOWNSTREAMBUFFERSIZE    32
-
-#define IOTSTX                  '#'
-#define IOTETX                  '\n'
-
-#define HTTPMSGMAXSIZE          4096
-#define GENERICSTRBUFFERSIZE    256
-#define TIMESTAMPBUFFERSIZE     64
-
-#define USESSL                  1
-
-typedef union
-{
-    struct
-    {
-        uint32_t txBusy                 : 1; // 0
-        uint32_t rxFifoEmpty            : 1; // 1
-        uint32_t txFifoFull             : 1; // 2
-        uint32_t rxFifoFull             : 1; // 3
-        uint32_t txFifoEmpty            : 1; // 4
-        uint32_t rxBusy                 : 1; // 5
-        uint32_t nBytesInTxFifo         : 5; // 6,7,8,9,10
-        uint32_t nBytesInRxFifo         : 5; // 11,12,13,14,15
-        uint32_t nBytesCopiedToTxFifo   : 5; // 16,17,18,19,20
-        uint32_t reserved               : 11; // 21,22,23,24,25,26,27,28,29,30,31
-    };
-    int32_t i32;
-} tBscStatus;
-
-typedef struct
-{
-    uint8_t stx;
-    uint8_t cmdCode;
-} tIotCmdHeader;
-
-typedef struct
-{
-    tIotCmdHeader header;
-    uint8_t payloadSize;
-    uint8_t payload[32];
-    uint8_t enDownlink;
-    uint8_t etx;
-} tIotCmdSend;
-
-typedef struct
-{
-    tIotCmdHeader header;
-    uint8_t cmdCode;
-    uint8_t spare;
-    uint8_t etx;
-} tIotCmdReadEnable;
-
-typedef enum
-{
-    S_IDLE,
-    S_PARSEIOTHEADER,
-    S_FLAGERROR_UNKNOWNCMD,
-    S_FLAGERROR_INVALIDSTX,
-    S_PARSECMDSEND,
-    S_PARSECMDREADENA,
-    S_BUILDRESPONSE,
-} tSmState;
+#include "SACRPiIotSlave.h"
+#include "SACServerComms.h"
+#include "SACPrintUtils.h"
 
 /********************** Globals *********************/
 uint32_t uSleepMicrosec = 1000; // number of micro seconds to sleep if no i2c transaction received. 32bytes take about 3.2ms to transmit.
@@ -119,22 +51,7 @@ typedef struct
 bsc_xfer_t sI2cTransfer; // i2c transfer struct
 volatile tBscStatus sI2cStatus;
 tSmState sState = S_IDLE;
-uint8_t mabUpstreamDataBuffer[UPSTREAMBUFFERSIZE] = {0x00};
-uint8_t mabDownstreamDataBuffer[DOWNSTREAMBUFFERSIZE] = {0x00};
-time_t sRawTime;
 char msGenericStringBuffer[GENERICSTRBUFFERSIZE] = {0x00};
-char msTimestampBuffer[TIMESTAMPBUFFERSIZE] = {0x00};
-
-char *msHttpHost;
-int miHttpPortNo;
-char *msHttpMsgFmt;
-struct hostent *msHttpServer;
-struct sockaddr_in msHttpServerAddr;
-int miHttpSocketFd;
-char msHttpTxMessage[HTTPMSGMAXSIZE] = {0x00};
-char msHttpRxMessage[HTTPMSGMAXSIZE] = {0x00};
-
-SSL_CTX *sSSLContext;
 /****************************************************/
 
 
@@ -143,20 +60,10 @@ uint8_t slave_init();
 void runSlave();
 void listeningTask();
 void closeSlave();
-char* printTimestamp();
 float getTickSec();
 int getControlBits(int address, bool open, bool rxEnable);
 void closeSlave();
 void SIGHandler(int signum);
-
-int httpSocketInit();
-int httpSendRequest();
-int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
-int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
-void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength);
-char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
-void sslInit();
-void sslClose();
 /****************************************************/
 
 
@@ -365,20 +272,6 @@ void listeningTask()
     
 }
 
-/*
-    Makes use of and overwrites the msTimestampBuffer.
-*/
-char* printTimestamp()
-{
-    memset((void *)msTimestampBuffer, 0x00, TIMESTAMPBUFFERSIZE);
-    struct tm* tm_info;    
-    sRawTime = time(NULL);
-    
-    tm_info = localtime(&sRawTime);
-    strftime(msTimestampBuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
-    return msTimestampBuffer;
-}
-
 float getTickSec()
 {
     return ((float)gpioTick() * 1.0e-6); 
@@ -454,216 +347,6 @@ void SIGHandler(int signum)
 }
 
 
-int httpSocketInit()
-{
-    /* first what are we going to send and where are we going to send it? */
-    /* send a post to:
-        https://dashboard.safeandclean.be/mobile/webhook?id={device}&time={time}&seqNumber={seqNumber}&ack={ack}&data={data}
-    */
-    #if USESSL == 1
-        miHttpPortNo = 443;
-    #else
-        miHttpPortNo = 80;
-    #endif
-    
-    msHttpHost = "dashboard.safeandclean.be";
-    
-    /* create the http socket */
-    miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (miHttpSocketFd < 0)
-    {
-        printf("[ERROR] (%s) %s: Failed to open socket\n", printTimestamp(), __func__);
-        return -1;
-    }
-    
-    /* lookup the server ip address */
-    msHttpServer = gethostbyname(msHttpHost);
-    if (msHttpServer == NULL) 
-    {
-        printf("[ERROR] (%s) %s: No such host: %s\n", printTimestamp(), __func__, msHttpHost);
-        return -1;
-    }
-    
-    /* clear and fill in the server address structure */
-    memset(&msHttpServerAddr, 0, sizeof(msHttpServerAddr));
-    msHttpServerAddr.sin_family = AF_INET;
-    msHttpServerAddr.sin_port = htons(miHttpPortNo);
-    memcpy(&msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
-    
-    printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", printTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
-    
-    return 0;
-}
-
-
-/************** int httpSendRequest() *********************
-    Uses the buffers 
-    char msHttpTxMessage[HTTPMSGMAXSIZE]
-    char msHttpRxMessage[HTTPMSGMAXSIZE]
-************************************************************/
-int httpSendRequest()
-{
-    /* initialize the socket */
-    httpSocketInit();
-    
-    /* connect the socket */
-    int iResult;
-    iResult = connect(miHttpSocketFd, (struct sockaddr *)&msHttpServerAddr, sizeof(msHttpServerAddr));
-    if (iResult < 0)
-    {
-        int iErrsv = errno;
-        printf("[ERROR] (%s) %s: Could not connect to socket 0x%x. Socket connect error code %i.\n", printTimestamp(), __func__, miHttpSocketFd, iErrsv);
-        return -1;
-    }
-    
-    #if USESSL == 1
-    // create an SSL connection and attach it to the socket
-    SSL *sSSLConn = SSL_new(sSSLContext);
-    SSL_set_fd(sSSLConn, miHttpSocketFd);
-    ERR_clear_error(); // clear error queue
-    iResult = SSL_connect(sSSLConn);
-    if (iResult != 1)
-    {
-        int iErrsv = SSL_get_error(sSSLConn, iResult);
-        printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", printTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
-        return -1;
-    }
-    #endif
-    
-    #if USESSL == 1
-        /* send the request */
-        httpWriteMsgToSocket(0, sSSLConn);
-        /* receive the response */
-        httpReadRespFromSocket(0, sSSLConn);
-        SSL_shutdown(sSSLConn);
-    #else
-        /* send the request */
-        httpWriteMsgToSocket(miHttpSocketFd, NULL);
-        /* receive the response */
-        httpReadRespFromSocket(miHttpSocketFd, NULL);
-    #endif
-    
-    close(miHttpSocketFd);
-    return 0;
-}
-
-/************* int httpWriteMsgToSocket *********************
-    Uses the buffer: 
-    char msHttpTxMessage[HTTPMSGMAXSIZE]
-************************************************************/
-int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn)
-{
-    int iBytesCurrentlyProcessed = 0;
-    int iBytesToProcess = strlen(msHttpTxMessage);
-    int iBytesSent = 0;
-    
-    do
-    {
-        #if USESSL == 1
-            iBytesCurrentlyProcessed = SSL_write(sSSLConn, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
-        #else
-            iBytesCurrentlyProcessed = write(iSocketFd, (char *)((uint32_t)msHttpTxMessage + (uint32_t)iBytesSent), iBytesToProcess - iBytesSent);
-        #endif
-        if(iBytesCurrentlyProcessed < 0)
-        {
-            printf("[ERROR] (%s) %s: Could not write message %s to socket 0x%x. Socket write error code %i.\n", printTimestamp(), __func__, msHttpTxMessage, miHttpSocketFd, iBytesCurrentlyProcessed);
-            return -1;
-        }
-        if(iBytesCurrentlyProcessed == 0)
-        {
-            break;
-        }
-        iBytesSent += iBytesCurrentlyProcessed;
-    } while(iBytesSent < iBytesToProcess);
-    
-    printf("[INFO] (%s) %s: %i http request message bytes written to socket:\n"
-            "******* ASCII begin *******\n"
-            "%s\n"
-            "******** ASCII end ********\n"
-            , printTimestamp(), __func__, iBytesSent,
-            msHttpTxMessage
-            );
-    return 0;
-}
-
-/************ int httpReadRespFromSocket ********************
-    Uses the buffer: 
-    char msHttpRxMessage[HTTPMSGMAXSIZE]
-************************************************************/
-int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
-{
-    int iBytesReceived = 0; 
-    int iBytesCurrentlyProcessed = 0;
-    int iBytesToProcess = sizeof(msHttpRxMessage) - 1;
-    
-    memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage)); // clear buffer
-    do
-    {
-        #if USESSL == 1
-            iBytesCurrentlyProcessed = SSL_read(sSSLConn, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
-        #else
-            iBytesCurrentlyProcessed = read(iSocketFd, (char *)((uint32_t)msHttpRxMessage + (uint32_t)iBytesReceived), iBytesToProcess - iBytesReceived);
-        #endif    
-        if(iBytesCurrentlyProcessed < 0)
-        {
-            printf("[ERROR] (%s) %s: Could not read response from socket 0x%x. Socket write error code %i.\n", printTimestamp(), __func__, miHttpSocketFd, iBytesCurrentlyProcessed);
-            return -1;
-        }
-        if(iBytesCurrentlyProcessed == 0)
-        {
-            break;
-        }
-        iBytesReceived += iBytesCurrentlyProcessed;
-    } while(iBytesReceived < iBytesToProcess);
-    
-    if(iBytesReceived == iBytesToProcess)
-    {
-        printf("[ERROR] (%s) %s: Receive buffer ran out of space. Max. number of bytes: %i.\n", printTimestamp(), __func__, HTTPMSGMAXSIZE);
-        return -1;
-    }
-    
-    /* show the stuff that we have received */
-    
-    printf("[INFO] (%s) %s: %i http request message bytes received in socket:\n"
-            "******* ASCII begin *******\n"
-            "%s\n"
-            "******** ASCII end ********\n"
-            , printTimestamp(), __func__, iBytesReceived,
-            msHttpRxMessage
-            );
-    return 0;
-}
-
-/******************* httpBuildRequestMsg *******************
-    *) befor usage, int httpSocketInit() must be executed first.
-    *) Is required for int httpSendRequest().
-************************************************************/
-void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
-{
-    char sUpstreamMsg[UPSTREAMBUFFERSIZE*2 + 1] = {0x00};
-    char sParsedByte[3] = {0x00}; // adding '/0' character
-    int iBytesCurrentlyProcessed = 0;
-    
-    // prepare upstream payload data
-    do
-    {
-        sprintf(sParsedByte, "%02x", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)));
-        strcat(sUpstreamMsg, sParsedByte);
-        iBytesCurrentlyProcessed += 1;
-    } while(iBytesCurrentlyProcessed < UPSTREAMBUFFERSIZE);
-    
-    msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\n\r\n";
-    //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", sUpstreamMsg);
-    //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", "deadbeefdeadbeef");
-    
-    sprintf(msHttpTxMessage, "%s\r\n", 
-        "GET /mobile/webhook?id=SC-4GTEST&time=1594998140&seqNumber=207&ack=1&data=deadbeefdeadbeef HTTP/1.1\r\n"
-        "Host: dashboard.safeandclean.be\r\n"
-        );
-        
-}
-
-
 /****************** printBytesAsHexString *******************
     Makes use of and overwrites the msGenericStringBuffer.
     return a pointer to the msGenericStringBuffer.
@@ -691,20 +374,8 @@ char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator
     return msGenericStringBuffer;
 }
 
-void sslInit()
-{
-    // initialize OpenSSL - do this once and stash ssl_ctx in a global var
-    SSL_load_error_strings();
-    SSL_library_init();
-    sSSLContext = SSL_CTX_new(SSLv23_client_method());
-}
-
-void sslClose()
-{
-    return;
-}
-
 /*************************************************************************************************/
+
 /*************************** main ***************************
     Program entry point
 ************************************************************/
