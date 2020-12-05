@@ -117,9 +117,10 @@ void runSlave()
 
 void listeningTask()
 {
-    uint8_t bEtx;
+    //uint8_t bEtx;
     static uint8_t bErrorResponse = 0x00;   
     tCtrlSendCmd *pLastSendCommand = getLastSendCmd(); // get the address of the last saved send command
+    tCtrlReadEnaCmd *pLastReadEnaCommand = getLastReadEnaCmd(); // get the address of the last saved read enable command
     
     // Protocol state machine.
     // update the transfer struct and get the peripheral status.
@@ -182,7 +183,6 @@ void listeningTask()
         case S_PARSECMDSEND:            
             pLastSendCommand = setLastSendCmd((void *)&sI2cTransfer.rxBuf[0]);
             printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, pLastSendCommand->payloadSize, (uint32_t)pLastSendCommand->payload, pLastSendCommand->endTag);
-
             if (pLastSendCommand->endTag == IOT_FRMENDTAG)
             {
                 // received correct ETX
@@ -191,7 +191,7 @@ void listeningTask()
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
                 bscXfer(&sI2cTransfer);
                 // try to send http request with payload
-                httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize);
+                httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize - 1); // -1 since payloadsize includes the read request byte
                 httpSendRequest();
                 // tell master were back
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
@@ -209,8 +209,8 @@ void listeningTask()
             
            
         case S_PARSECMDREADENA:
-            bEtx = sI2cTransfer.rxBuf[3];
-            printf("[INFO] (%s) %s: IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, bEtx);
+            pLastReadEnaCommand = setLastReadEnaCmd((void *)&sI2cTransfer.rxBuf[0]);
+            printf("[INFO] (%s) %s: IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, pLastReadEnaCommand->endTag);
             sState = S_BUILDRESPONSE;
             break;
             

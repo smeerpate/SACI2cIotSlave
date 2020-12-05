@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define STRUCTS_SENDCMDPAYLOADSIZE      12
+#define STRUCTS_DECKEDREPLYPAYLOADSIZE  8
+
 typedef struct
 {
     uint8_t startTag;
@@ -17,10 +20,10 @@ typedef union
         uint8_t cmdCode;
         uint8_t payloadSize;
         uint8_t downlinkIndicator;
-        uint8_t payload[12];
+        uint8_t payload[STRUCTS_SENDCMDPAYLOADSIZE];
         uint8_t endTag;
     };
-    uint8_t ui8[17];
+    uint8_t ui8[5+STRUCTS_SENDCMDPAYLOADSIZE];
 } tCtrlSendCmd; // contains upstream payload
 
 typedef union
@@ -46,7 +49,7 @@ typedef union
         uint8_t payload[8];
         uint8_t endTag;
     };
-    uint8_t ui8[13];
+    uint8_t ui8[5+STRUCTS_DECKEDREPLYPAYLOADSIZE];
 } tCtrlDeckedReply; // contains downstream payload
 
 typedef union
@@ -64,6 +67,8 @@ typedef union
 
 void structsInit();
 tCtrlSendCmd *setLastSendCmd(void *pSourceData);
+tCtrlReadEnaCmd *setLastReadEnaCmd(void *pSourceData);
 tCtrlSendCmd *getLastSendCmd();
+tCtrlReadEnaCmd *getLastReadEnaCmd();
 
 #endif

@@ -22,7 +22,7 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
 /******************** private global variables **********************/
 char *msHttpHost;
 int miHttpPortNo;
-char *msHttpMsgFmt;
+//char *msHttpMsgFmt;
 struct hostent *msHttpServer;
 struct sockaddr_in msHttpServerAddr;
 int miHttpSocketFd;
@@ -221,26 +221,18 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
     *) Is required for int httpSendRequest().
 ************************************************************/
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
-{
-    char sUpstreamMsg[UPSTREAMBUFFERSIZE*2 + 1] = {0x00};
-    char sParsedByte[3] = {0x00}; // adding '/0' character
-    int iBytesCurrentlyProcessed = 0;
-    
-    // prepare upstream payload data
-    do
-    {
-        sprintf(sParsedByte, "%02x", *((char *)(I2CRxPayloadAddress + iBytesCurrentlyProcessed)));
-        strcat(sUpstreamMsg, sParsedByte);
-        iBytesCurrentlyProcessed += 1;
-    } while(iBytesCurrentlyProcessed < UPSTREAMBUFFERSIZE);
-    
-    msHttpMsgFmt = "GET /mobile/webhook?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\n\r\n";
-    //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "0", sUpstreamMsg);
-    //sprintf(msHttpTxMessage, msHttpMsgFmt, "SC-4GTEST", "1594998140", "207", "1", "deadbeefdeadbeef");
-    
-    sprintf(msHttpTxMessage, "%s\r\n", 
-        "GET /mobile/webhook?id=SC-4GTEST&time=1594998140&seqNumber=207&ack=1&data=deadbeefdeadbeef HTTP/1.1\r\n"
-        "Host: dashboard.safeandclean.be\r\n"
+{   
+    char *pUpstreamDataString = printBytesAsHexString(I2CRxPayloadAddress, I2CRxPayloadLength, false, NULL);
+    printf("[INFO] (%s) %s: Built upstream data string:\n\t\'%s\'\n", printTimestamp(), __func__, pUpstreamDataString);
+        
+    sprintf(msHttpTxMessage, "GET %s?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
+        "/mobile/webhook",              // path
+        "SC-4GTEST",                    // id=
+        "1594998140",                   // time=
+        "207",                          // seqNumber=
+        "1",                            // ack=
+        pUpstreamDataString,            // data=
+        "dashboard.safeandclean.be"     // Host:
         );
         
 }
