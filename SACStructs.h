@@ -5,6 +5,7 @@
 
 #define STRUCTS_SENDCMDPAYLOADSIZE      12
 #define STRUCTS_DECKEDREPLYPAYLOADSIZE  8
+#define STRUCTS_SERVREQ_MAXSTRSIZE      32
 
 typedef struct
 {
@@ -68,15 +69,27 @@ typedef union
 
 typedef struct
 {
-    uint8_t expectingContent;
+    char host[STRUCTS_SERVREQ_MAXSTRSIZE];
+    char path[STRUCTS_SERVREQ_MAXSTRSIZE];
+    char deviceId[STRUCTS_SERVREQ_MAXSTRSIZE];
+    uint32_t time;
+    uint32_t seqNr;
+    uint8_t ack;
+    char *data; // data as hex-string e.g. "01000000001ecc36301fffff" 
+} tServerRequest;
+
+typedef struct
+{
     int replycode;
-    char replyContent[16];
-} tServerReply
+    char *data; // data as hex-string e.g. "1d301f73deadbeef"
+} tServerReply;
 
 void structsInit();
 tCtrlSendCmd *setLastSendCmd(void *pSourceData);
 tCtrlReadEnaCmd *setLastReadEnaCmd(void *pSourceData);
 tCtrlSendCmd *getLastSendCmd();
 tCtrlReadEnaCmd *getLastReadEnaCmd();
+tServerReply *getLastServerReply();
+tServerRequest *getLastServerRequest();
 
 #endif

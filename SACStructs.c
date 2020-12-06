@@ -4,17 +4,23 @@
 /****************** private function prototypes *********************/
 void structsInitLastSendCmd();
 void structsInitLastReadEnaCmd();
+void structsInitLastServerReply();
+void structsInitLastServerRequest();
 /********************************************************************/
 
 /******************** private global variables **********************/
 static tCtrlSendCmd sLastSendCmd;
 static tCtrlReadEnaCmd sLastReadEnaCmd;
+static tServerRequest sLastServerRequest;
+static tServerReply sLastServerReply;
 /********************************************************************/
 
 void structsInit()
 {
     structsInitLastSendCmd();
     structsInitLastReadEnaCmd();
+    structsInitLastServerReply();
+    structsInitLastServerRequest();
 }
 
 /******** Initializers **********/
@@ -26,6 +32,16 @@ void structsInitLastSendCmd()
 void structsInitLastReadEnaCmd()
 {
     memset((void *)&sLastReadEnaCmd, 0x00, sizeof(tCtrlReadEnaCmd));
+}
+
+void structsInitLastServerReply()
+{
+    memset((void *)&sLastServerReply, 0x00, sizeof(tServerReply));
+}
+
+void structsInitLastServerRequest()
+{
+    memset((void *)&sLastServerRequest, 0x00, sizeof(tServerRequest));
 }
 /********************************/
 
@@ -52,5 +68,15 @@ tCtrlSendCmd *getLastSendCmd()
 tCtrlReadEnaCmd *getLastReadEnaCmd()
 {
     return &sLastReadEnaCmd;
+}
+
+tServerReply *getLastServerReply()
+{
+    return &sLastServerReply;
+}
+
+tServerRequest *getLastServerRequest()
+{
+    return &sLastServerRequest;
 }
 /********************************/

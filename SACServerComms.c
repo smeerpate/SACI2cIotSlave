@@ -1,5 +1,6 @@
 #include "SACServerComms.h"
 #include "SACPrintUtils.h"
+#include "SACStructs.h"
 
 #include "string.h" /* memcpy, memset */
 #include <stdlib.h> /* atoi */
@@ -229,15 +230,35 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 {   
     char *pUpstreamDataString = printBytesAsHexString(I2CRxPayloadAddress, I2CRxPayloadLength, false, NULL);
     printf("[INFO] (%s) %s: Built upstream data string:\n\t\'%s\'\n", printTimestamp(), __func__, pUpstreamDataString);
+    
+    tServerRequest *sRequest = getLastServerRequest();
+    sprintf(sRequest->host, "%s", IOT_HOST);
+    sprintf(sRequest->path, "%s", IOT_PATH);
+    sprintf(sRequest->deviceId, "%s", IOT_DEVICEID);
+    sRequest->time = 1594998140;
+    sRequest->seqNr = 208;
+    sRequest->ack = 1;
+    sRequest->data = pUpstreamDataString;
         
-    sprintf(msHttpTxMessage, "GET %s?id=%s&time=%s&seqNumber=%s&ack=%s&data=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
-        "/mobile/webhook",              // path
-        "SC-4GTEST",                    // id=
-        "1594998140",                   // time=
-        "207",                          // seqNumber=
-        "1",                            // ack=
-        pUpstreamDataString,            // data=
-        "dashboard.safeandclean.be"     // Host:
+    // sprintf(msHttpTxMessage, "GET %s?id=%s&time=%u&seqNumber=%u&ack=%u&data=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
+        // sRequest->path,           // path
+        // sRequest->deviceId,       // id=
+        // sRequest->time,           // time=
+        // sRequest->seqNr,          // seqNumber=
+        // sRequest->ack,            // ack=
+        // sRequest->data,           // data=
+        // sRequest->host            // Host:
+        // );
+        
+    sprintf(msHttpTxMessage, "GET %s?id=%s&time=%u&seqNumber=%u&ack=%u&data=%s&response=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
+        sRequest->path,           // path
+        sRequest->deviceId,       // id=
+        sRequest->time,           // time=
+        sRequest->seqNr,          // seqNumber=
+        sRequest->ack,            // ack=
+        sRequest->data,           // data=
+        "mijneigenrespons123",
+        sRequest->host           // Host:
         );
         
 }
