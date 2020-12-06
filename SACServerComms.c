@@ -2,6 +2,7 @@
 #include "SACPrintUtils.h"
 
 #include "string.h" /* memcpy, memset */
+#include <stdlib.h> /* atoi */
 #include <sys/socket.h> /* socket, connect */
 #include <netinet/in.h> /* struct sockaddr_in, struct sockaddr */
 #include <netdb.h> /* struct hostent, gethostbyname */
@@ -12,11 +13,13 @@
 
 #define UPSTREAMBUFFERSIZE      12
 #define DOWNSTREAMBUFFERSIZE    32
+#define MAXSERVERREPLYLINES     64
 
 /****************** private function prototypes *********************/
 int httpSocketInit();
 int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
 int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
+void httpParseReplyMsg(char *sRawMessage);
 /********************************************************************/
 
 /******************** private global variables **********************/
@@ -79,6 +82,8 @@ int httpSendRequest()
         /* receive the response */
         httpReadRespFromSocket(miHttpSocketFd, NULL);
     #endif
+    
+    httpParseReplyMsg(msHttpRxMessage);
     
     close(miHttpSocketFd);
     return 0;
@@ -216,7 +221,7 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
     return 0;
 }
 
-/******************* httpBuildRequestMsg *******************
+/******************* httpBuildRequestMsg ********************
     *) befor usage, int httpSocketInit() must be executed first.
     *) Is required for int httpSendRequest().
 ************************************************************/
@@ -237,6 +242,82 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         
 }
 
+/******************* httpParseReplyMsg **********************
+1) Server reply must start with "HTTP/1.1 " (first line).
+
+Example server reply:
+    HTTP/1.1 200 OK\r\n
+    Date: Sat, 05 Dec 2020 13:10:57 GMT\r\n
+    Server: Apache/2.4.29 (Ubuntu)\r\n
+    Cache-Control: max-age=0, must-revalidate, private\r\n
+    Expires: Sat, 05 Dec 2020 13:10:57 GMT\r\n
+    Vary: Accept-Encoding\r\n
+    Transfer-Encoding: chunked\r\n
+    Content-Type: text/html; charset=UTF-8\r\n
+    \r\n
+    10\r\n
+    36301f73deadbeef\r\n
+    0\r\n
+    \r\n
+    \r\n
+************************************************************/
+void httpParseReplyMsg(char *sRawMessage)
+{
+    int iInitLength = strlen(sRawMessage);
+    int iNTokens = 0;
+	char asDelimiters[] = "\n";
+    char *apLines[MAXSERVERREPLYLINES] = {NULL};
+    int iReplyCode = -1;
+    
+    //printf("\t# in hex: %s #\n", printBytesAsHexString((uint32_t)sRawMessage, iInitLength, true, ", "));
+    
+    // load the string token function
+    char *pTemp = strtok(sRawMessage, asDelimiters);
+    // first '\n' has now been replaced by 0x00...
+    
+    while(pTemp != NULL && iNTokens < MAXSERVERREPLYLINES)
+	{
+		printf("\t# %s #\n", pTemp);
+        apLines[iNTokens] = pTemp;
+        pTemp = strtok(NULL, asDelimiters);
+        iNTokens += 1;
+	}
+    //printf("[INFO] %s: Found %i tokens.\n", __func__, iNTokens);
+    //printf("\t# in hex: %s #\n", printBytesAsHexString((uint32_t)sRawMessage, iInitLength, true, ", "));
+    
+    // look for the phrase "HTTP/1.1 "
+    // it should be on line index 0
+    if(apLines[0] != NULL)
+    {
+        if(strncmp(apLines[0], "HTTP/1.1 ", 9) == 0)
+        {
+            iReplyCode = atoi((char *)(apLines[0] + 9));
+            printf("[INFO] %s: Found reply code: %i\n", __func__, iReplyCode);
+        }
+        else
+        {
+            // Incorrect header, expected "HTTP/1.1 ".
+        }
+    }
+    else
+    {
+        // No tokens ("\n") found in sever reply. 
+    }
+    
+    // Check the response code (200 = ok, 204 = ok but no payload).
+    // look for the next blank line
+    // If we asked for content (ack=1) and response code = 200, the server should return content after the first linefeed. 
+    
+    // second line after the blank line is payload.
+    // it should be 16 characters long
+    
+    // look for two blank lines at the end of the message
+    // it should start two lines further.
+    
+    // clear the original message, we're done with it + it's been corrupted by strok
+    memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
+}
+
 /*********************** sslInit ****************************
 
 ************************************************************/
@@ -253,5 +334,6 @@ void sslInit()
 ************************************************************/
 void sslClose()
 {
+    SSL_CTX_free(sSSLContext);
     return;
 }

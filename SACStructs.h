@@ -65,6 +65,14 @@ typedef union
     uint8_t ui8[5];
 } tCtrlEmptyReply;
 
+
+typedef struct
+{
+    uint8_t expectingContent;
+    int replycode;
+    char replyContent[16];
+} tServerReply
+
 void structsInit();
 tCtrlSendCmd *setLastSendCmd(void *pSourceData);
 tCtrlReadEnaCmd *setLastReadEnaCmd(void *pSourceData);

@@ -247,7 +247,7 @@ void listeningTask()
                     break;
                 default:
                     // unknown response code
-                    printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, sI2cTransfer.rxBuf[3]);
+                    printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator);
                     sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = 0x03;
