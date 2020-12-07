@@ -47,7 +47,7 @@ typedef union
         uint8_t cmdCode;
         uint8_t errorCode;
         uint8_t payloadSize;
-        uint8_t payload[8];
+        uint8_t payload[STRUCTS_DECKEDREPLYPAYLOADSIZE];
         uint8_t endTag;
     };
     uint8_t ui8[5+STRUCTS_DECKEDREPLYPAYLOADSIZE];
@@ -91,5 +91,6 @@ tCtrlSendCmd *getLastSendCmd();
 tCtrlReadEnaCmd *getLastReadEnaCmd();
 tServerReply *getLastServerReply();
 tServerRequest *getLastServerRequest();
+tCtrlDeckedReply *getCtrlDeckedReply();
 
 #endif

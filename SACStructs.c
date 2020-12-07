@@ -6,6 +6,7 @@ void structsInitLastSendCmd();
 void structsInitLastReadEnaCmd();
 void structsInitLastServerReply();
 void structsInitLastServerRequest();
+void structsInitCtrlDeckedReply();
 /********************************************************************/
 
 /******************** private global variables **********************/
@@ -13,6 +14,7 @@ static tCtrlSendCmd sLastSendCmd;
 static tCtrlReadEnaCmd sLastReadEnaCmd;
 static tServerRequest sLastServerRequest;
 static tServerReply sLastServerReply;
+static tCtrlDeckedReply sCtrlDeckedReply;
 /********************************************************************/
 
 void structsInit()
@@ -21,6 +23,7 @@ void structsInit()
     structsInitLastReadEnaCmd();
     structsInitLastServerReply();
     structsInitLastServerRequest();
+    structsInitCtrlDeckedReply();
 }
 
 /******** Initializers **********/
@@ -42,6 +45,11 @@ void structsInitLastServerReply()
 void structsInitLastServerRequest()
 {
     memset((void *)&sLastServerRequest, 0x00, sizeof(tServerRequest));
+}
+
+void structsInitCtrlDeckedReply()
+{
+    memset((void *)&sCtrlDeckedReply, 0x00, sizeof(tCtrlDeckedReply));
 }
 /********************************/
 
@@ -78,5 +86,10 @@ tServerReply *getLastServerReply()
 tServerRequest *getLastServerRequest()
 {
     return &sLastServerRequest;
+}
+
+tCtrlDeckedReply *getCtrlDeckedReply()
+{
+    return &sCtrlDeckedReply;
 }
 /********************************/

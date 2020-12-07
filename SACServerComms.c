@@ -16,7 +16,8 @@
 #define DOWNSTREAMBUFFERSIZE    32
 #define MAXSERVERREPLYLINES     64
 
-#define ADDUSERREPLYINREQUEST   0 //1
+#define ADDUSERREPLYINREQUEST   1 //1
+#define USERREPLYINREQUEST      "36301f03beefbabe"
 
 /****************** private function prototypes *********************/
 int httpSocketInit();
@@ -244,16 +245,6 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     sRequest->ack = 1;
     sRequest->data = pUpstreamDataString;
         
-    // sprintf(msHttpTxMessage, "GET %s?id=%s&time=%lu&seqNumber=%u&ack=%u&data=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
-        // sRequest->path,           // path
-        // sRequest->deviceId,       // id=
-        // sRequest->time,           // time=
-        // sRequest->seqNr,          // seqNumber=
-        // sRequest->ack,            // ack=
-        // sRequest->data,           // data=
-        // sRequest->host            // Host:
-        // );
-        
     sprintf(msHttpTxMessage, "GET %s?id=%s&time=%lu&seqNumber=%u&ack=%u&data=%s"
                             #if ADDUSERREPLYINREQUEST == 1
                                 "&response=%s"
@@ -266,7 +257,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         sRequest->ack,            // ack=
         sRequest->data,           // data=
         #if ADDUSERREPLYINREQUEST == 1
-            "mijneigenrespons123", // Add your custom reply here, only used for debugging!
+            USERREPLYINREQUEST, // Add your custom reply here, only used for debugging!
         #endif
         sRequest->host           // Host:
         );
@@ -275,6 +266,8 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 
 /******************* httpParseReplyMsg **********************
 1) Server reply must start with "HTTP/1.1 " (first line).
+2) reply paylod is two lines further than the first empty line
+    (an empty line should only contain \r\n)
 
 Example server reply:
     HTTP/1.1 200 OK\r\n
@@ -379,6 +372,12 @@ int httpParseReplyMsg(char *sRawMessage)
         iPayloadLineIndex = iBlankLineIndex + 2;
         printf("[INFO] %s: Found payload line at substring index %i with content:\n\t%s\n", __func__, iPayloadLineIndex, apLines[iPayloadLineIndex]);
     }
+    
+    //printf("\t\'%s\'\n", printSplitByteStringInBytes(apLines[iPayloadLineIndex], ','));
+    tCtrlDeckedReply *pReplyForController = getCtrlDeckedReply();
+    int iNBytesParsed = printParseHexStringToBytes(apLines[iPayloadLineIndex], pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE);
+    printf("[INFO] (%s) %s: parsed %d bytes\n", printTimestamp(), __func__, iNBytesParsed);
+    printf("\t# Bytes (HEX): %s\n", printBytesAsHexString((uint32_t)pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE, true, ", "));
     
     // second line after the blank line is payload.
     // it should be 16 characters long
