@@ -16,11 +16,13 @@
 #define DOWNSTREAMBUFFERSIZE    32
 #define MAXSERVERREPLYLINES     64
 
+#define ADDUSERREPLYINREQUEST   0 //1
+
 /****************** private function prototypes *********************/
 int httpSocketInit();
 int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
 int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
-void httpParseReplyMsg(char *sRawMessage);
+int httpParseReplyMsg(char *sRawMessage);
 /********************************************************************/
 
 /******************** private global variables **********************/
@@ -33,6 +35,7 @@ int miHttpSocketFd;
 char msHttpTxMessage[HTTPMSGMAXSIZE] = {0x00};
 char msHttpRxMessage[HTTPMSGMAXSIZE] = {0x00};
 SSL_CTX *sSSLContext;
+uint32_t muiSeqNr = 0;
 /********************************************************************/
 
 
@@ -235,12 +238,13 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     sprintf(sRequest->host, "%s", IOT_HOST);
     sprintf(sRequest->path, "%s", IOT_PATH);
     sprintf(sRequest->deviceId, "%s", IOT_DEVICEID);
-    sRequest->time = 1594998140;
-    sRequest->seqNr = 208;
+    sRequest->time = printGetUnixEpochTimeAsInt();//1594998140;
+    sRequest->seqNr = muiSeqNr;
+    muiSeqNr += 1;
     sRequest->ack = 1;
     sRequest->data = pUpstreamDataString;
         
-    // sprintf(msHttpTxMessage, "GET %s?id=%s&time=%u&seqNumber=%u&ack=%u&data=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
+    // sprintf(msHttpTxMessage, "GET %s?id=%s&time=%lu&seqNumber=%u&ack=%u&data=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
         // sRequest->path,           // path
         // sRequest->deviceId,       // id=
         // sRequest->time,           // time=
@@ -250,14 +254,20 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
         // sRequest->host            // Host:
         // );
         
-    sprintf(msHttpTxMessage, "GET %s?id=%s&time=%u&seqNumber=%u&ack=%u&data=%s&response=%s HTTP/1.1\r\nHost: %s\r\n\r\n", 
+    sprintf(msHttpTxMessage, "GET %s?id=%s&time=%lu&seqNumber=%u&ack=%u&data=%s"
+                            #if ADDUSERREPLYINREQUEST == 1
+                                "&response=%s"
+                            #endif
+                            " HTTP/1.1\r\nHost: %s\r\n\r\n", 
         sRequest->path,           // path
         sRequest->deviceId,       // id=
         sRequest->time,           // time=
         sRequest->seqNr,          // seqNumber=
         sRequest->ack,            // ack=
         sRequest->data,           // data=
-        "mijneigenrespons123",
+        #if ADDUSERREPLYINREQUEST == 1
+            "mijneigenrespons123", // Add your custom reply here, only used for debugging!
+        #endif
         sRequest->host           // Host:
         );
         
@@ -282,13 +292,15 @@ Example server reply:
     \r\n
     \r\n
 ************************************************************/
-void httpParseReplyMsg(char *sRawMessage)
+int httpParseReplyMsg(char *sRawMessage)
 {
     int iInitLength = strlen(sRawMessage);
     int iNTokens = 0;
 	char asDelimiters[] = "\n";
     char *apLines[MAXSERVERREPLYLINES] = {NULL};
     int iReplyCode = -1;
+    int iBlankLineIndex = -1;
+    int iPayloadLineIndex = -1;
     
     //printf("\t# in hex: %s #\n", printBytesAsHexString((uint32_t)sRawMessage, iInitLength, true, ", "));
     
@@ -318,16 +330,55 @@ void httpParseReplyMsg(char *sRawMessage)
         else
         {
             // Incorrect header, expected "HTTP/1.1 ".
+            printf("[ERROR] %s: Incorrect header, expected \'HTTP/1.1 \', got:\n\t%s\n", __func__, apLines[0]);
+            memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
+            return -1;
         }
     }
     else
     {
-        // No tokens ("\n") found in sever reply. 
+        // No tokens ("\n") found in sever reply.
+        printf("[ERROR] %s: Found no tokens in server reply.\n", __func__);
+        memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
+        return -2;
     }
     
     // Check the response code (200 = ok, 204 = ok but no payload).
-    // look for the next blank line
-    // If we asked for content (ack=1) and response code = 200, the server should return content after the first linefeed. 
+    if(iReplyCode != 200 && iReplyCode != 204)
+    {
+        // server reply code not supported
+        printf("[ERROR] %s: Server reply code %i not supported.\n", __func__, iReplyCode);
+        memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
+        return -(iReplyCode);
+    }
+    
+    // look for the index in the substring array of the next blank line
+    int i = 0;
+    for(i=0; i<iNTokens; i+=1)
+    {
+        if(strcmp(apLines[i], "\r") == 0)
+        {
+            // Found blank line at index i
+            iBlankLineIndex = i;
+            printf("[INFO] %s: Found first blank line at substring index: %i\n", __func__, iBlankLineIndex);
+            break;
+        }
+    }
+    if(iBlankLineIndex < 0)
+    {
+        // No blank lines found in sever reply.
+        printf("[ERROR] %s: Found no blank lines in server reply.\n", __func__);
+        memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
+        return -3;
+    }
+    
+    // If we asked for content (ack=1) and response code = 200, the server should return content after the first linefeed.
+    if(iReplyCode == 200)
+    {
+        // get payload
+        iPayloadLineIndex = iBlankLineIndex + 2;
+        printf("[INFO] %s: Found payload line at substring index %i with content:\n\t%s\n", __func__, iPayloadLineIndex, apLines[iPayloadLineIndex]);
+    }
     
     // second line after the blank line is payload.
     // it should be 16 characters long
@@ -337,6 +388,7 @@ void httpParseReplyMsg(char *sRawMessage)
     
     // clear the original message, we're done with it + it's been corrupted by strok
     memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
+    return 0;
 }
 
 /*********************** sslInit ****************************

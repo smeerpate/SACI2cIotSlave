@@ -50,3 +50,9 @@ char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator
     
     return msGenericStringBuffer;
 }
+
+long unsigned int printGetUnixEpochTimeAsInt()
+{
+    sRawTime = time(NULL);
+    return (unsigned long int)sRawTime;
+}

@@ -72,7 +72,7 @@ typedef struct
     char host[STRUCTS_SERVREQ_MAXSTRSIZE];
     char path[STRUCTS_SERVREQ_MAXSTRSIZE];
     char deviceId[STRUCTS_SERVREQ_MAXSTRSIZE];
-    uint32_t time;
+    long unsigned int time;
     uint32_t seqNr;
     uint8_t ack;
     char *data; // data as hex-string e.g. "01000000001ecc36301fffff" 

@@ -9,5 +9,6 @@
 
 char* printTimestamp();
 char* printBytesAsHexString(uint32_t startAddress, int length, bool addSeparator, const char * separator);
+long unsigned int printGetUnixEpochTimeAsInt();
 
 #endif
