@@ -121,6 +121,7 @@ void listeningTask()
     static uint8_t bErrorResponse = 0x00;   
     tCtrlSendCmd *pLastSendCommand = getLastSendCmd(); // get the address of the last saved send command
     tCtrlReadEnaCmd *pLastReadEnaCommand = getLastReadEnaCmd(); // get the address of the last saved read enable command
+    tCtrlDeckedReply *pDeckedReply = getCtrlDeckedReply(); // get the address of the last saved decked reply
     
     // Protocol state machine.
     // update the transfer struct and get the peripheral status.
@@ -230,20 +231,30 @@ void listeningTask()
                     break;
                 case 0x01:
                     // Master DID ask for downlink data.
-                    sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
-                    sI2cTransfer.txBuf[1] = 0x02;
-                    sI2cTransfer.txBuf[2] = bErrorResponse;
-                    sI2cTransfer.txBuf[3] = 0x08;
-                    sI2cTransfer.txBuf[4] = 0x36;
-                    sI2cTransfer.txBuf[5] = 0x30;
-                    sI2cTransfer.txBuf[6] = 0x1f;
-                    sI2cTransfer.txBuf[7] = 0x03;
-                    sI2cTransfer.txBuf[8] = 0xBE;
-                    sI2cTransfer.txBuf[9] = 0xEF;
-                    sI2cTransfer.txBuf[10] = 0xBE;
-                    sI2cTransfer.txBuf[11] = 0xEF;
-                    sI2cTransfer.txBuf[12] = IOT_FRMENDTAG;
-                    sI2cTransfer.txCnt = 13;
+                    // Payload was built in state S_PARSECMDSEND
+                    pDeckedReply->startTag = IOT_FRMSTARTTAG;
+                    pDeckedReply->cmdCode = 0x02;
+                    pDeckedReply->errorCode = bErrorResponse;
+                    pDeckedReply->payloadSize = STRUCTS_DECKEDREPLYPAYLOADSIZE;
+                    pDeckedReply->endTag = IOT_FRMENDTAG;
+                    
+                    memcpy((void *)&sI2cTransfer, (void *)pDeckedReply, 5+STRUCTS_DECKEDREPLYPAYLOADSIZE);
+                    sI2cTransfer.txCnt = 5+STRUCTS_DECKEDREPLYPAYLOADSIZE;
+                    
+                    // sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
+                    // sI2cTransfer.txBuf[1] = 0x02;
+                    // sI2cTransfer.txBuf[2] = bErrorResponse;
+                    // sI2cTransfer.txBuf[3] = 0x08;
+                    // sI2cTransfer.txBuf[4] = 0x36;
+                    // sI2cTransfer.txBuf[5] = 0x30;
+                    // sI2cTransfer.txBuf[6] = 0x1f;
+                    // sI2cTransfer.txBuf[7] = 0x03;
+                    // sI2cTransfer.txBuf[8] = 0xBE;
+                    // sI2cTransfer.txBuf[9] = 0xEF;
+                    // sI2cTransfer.txBuf[10] = 0xBE;
+                    // sI2cTransfer.txBuf[11] = 0xEF;
+                    // sI2cTransfer.txBuf[12] = IOT_FRMENDTAG;
+                    // sI2cTransfer.txCnt = 13;
                     break;
                 default:
                     // unknown response code

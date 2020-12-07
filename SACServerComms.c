@@ -17,7 +17,7 @@
 #define MAXSERVERREPLYLINES     64
 
 #define ADDUSERREPLYINREQUEST   1 //1
-#define USERREPLYINREQUEST      "36301f03beefbabe"
+#define USERREPLYINREQUEST      "35291f03beefbabe"
 
 /****************** private function prototypes *********************/
 int httpSocketInit();
