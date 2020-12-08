@@ -4,7 +4,9 @@
 #include <stdint.h>
 
 #define STRUCTS_SENDCMDPAYLOADSIZE      12
+#define STRUCTS_SENDCMDTOTALSIZE        STRUCTS_SENDCMDPAYLOADSIZE + 5
 #define STRUCTS_DECKEDREPLYPAYLOADSIZE  8
+#define STRUCTS_DECKEDREPLYTOTALSIZE    STRUCTS_DECKEDREPLYPAYLOADSIZE + 5
 #define STRUCTS_SERVREQ_MAXSTRSIZE      32
 
 typedef struct
@@ -24,7 +26,7 @@ typedef union
         uint8_t payload[STRUCTS_SENDCMDPAYLOADSIZE];
         uint8_t endTag;
     };
-    uint8_t ui8[5+STRUCTS_SENDCMDPAYLOADSIZE];
+    uint8_t ui8[STRUCTS_SENDCMDTOTALSIZE];
 } tCtrlSendCmd; // contains upstream payload
 
 typedef union
@@ -50,7 +52,7 @@ typedef union
         uint8_t payload[STRUCTS_DECKEDREPLYPAYLOADSIZE];
         uint8_t endTag;
     };
-    uint8_t ui8[5+STRUCTS_DECKEDREPLYPAYLOADSIZE];
+    uint8_t ui8[STRUCTS_DECKEDREPLYTOTALSIZE];
 } tCtrlDeckedReply; // contains downstream payload
 
 typedef union

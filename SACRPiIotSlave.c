@@ -62,6 +62,7 @@ void listeningTask();
 void closeSlave();
 float getTickSec();
 int getControlBits(int address, bool open, bool rxEnable);
+void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode);
 void closeSlave();
 void SIGHandler(int signum);
 /****************************************************/
@@ -121,7 +122,7 @@ void listeningTask()
     static uint8_t bErrorResponse = 0x00;   
     tCtrlSendCmd *pLastSendCommand = getLastSendCmd(); // get the address of the last saved send command
     tCtrlReadEnaCmd *pLastReadEnaCommand = getLastReadEnaCmd(); // get the address of the last saved read enable command
-    tCtrlDeckedReply *pDeckedReply = getCtrlDeckedReply(); // get the address of the last saved decked reply
+    
     
     // Protocol state machine.
     // update the transfer struct and get the peripheral status.
@@ -160,7 +161,7 @@ void listeningTask()
                         sState = S_PARSECMDSEND;
                         break;
                     default:
-                        sState = S_IDLE;
+                        sState = S_FLAGERROR_UNKNOWNCMD;
                         break;
                 }
             }
@@ -194,6 +195,7 @@ void listeningTask()
                 // try to send http request with payload
                 httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize - 1); // -1 since payloadsize includes the read request byte
                 httpSendRequest();
+                // This might take a while ...
                 // tell master were back
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
                 bscXfer(&sI2cTransfer);
@@ -221,7 +223,7 @@ void listeningTask()
             switch(pLastSendCommand->downlinkIndicator)
             {
                 case 0x00:
-                    // Master did not ask for downlink data. Only send Error code.
+                    // Master (i.e. SAC controller) did not ask for downlink data via i2c. Only send Error code.
                     sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = bErrorResponse;
@@ -230,17 +232,8 @@ void listeningTask()
                     sI2cTransfer.txCnt = 5;
                     break;
                 case 0x01:
-                    // Master DID ask for downlink data.
-                    // Payload was built in state S_PARSECMDSEND
-                    pDeckedReply->startTag = IOT_FRMSTARTTAG;
-                    pDeckedReply->cmdCode = 0x02;
-                    pDeckedReply->errorCode = bErrorResponse;
-                    pDeckedReply->payloadSize = STRUCTS_DECKEDREPLYPAYLOADSIZE;
-                    pDeckedReply->endTag = IOT_FRMENDTAG;
-                    
-                    memcpy((void *)&sI2cTransfer, (void *)pDeckedReply, 5+STRUCTS_DECKEDREPLYPAYLOADSIZE);
-                    sI2cTransfer.txCnt = 5+STRUCTS_DECKEDREPLYPAYLOADSIZE;
-                    
+                    // Master (i.e. SAC controller) DID ask for downlink data via i2c.
+                    copyDeckedReplyToI2cTxBuffer(0x02, bErrorResponse);
                     // sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     // sI2cTransfer.txBuf[1] = 0x02;
                     // sI2cTransfer.txBuf[2] = bErrorResponse;
@@ -334,6 +327,29 @@ int getControlBits(int address /* 7 bit address */, bool open, bool rxEnable) {
         flags = /*BK:*/ (1 << 7) | /*I2:*/ (0 << 2) | /*EN:*/ (0 << 0);
 
     return (address << 16 /*= to the start of significant bits*/) | flags;
+}
+
+void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode)
+{
+    tCtrlDeckedReply *pDeckedReply = getCtrlDeckedReply(); // get the address of the last saved decked reply
+    // build header and footer around decked reply payload
+    pDeckedReply->startTag = IOT_FRMSTARTTAG;
+    pDeckedReply->cmdCode = bCmdCode;
+    pDeckedReply->errorCode = bErrorCode;
+    pDeckedReply->payloadSize = STRUCTS_DECKEDREPLYPAYLOADSIZE;
+    pDeckedReply->endTag = IOT_FRMENDTAG;
+    // payload was filled after a call to httpSendRequest();
+    
+    int i;
+    for(i=0; i<STRUCTS_DECKEDREPLYTOTALSIZE; i += 1)
+    {
+        sI2cTransfer.txBuf[i] = pDeckedReply->ui8[i];
+    }
+    
+    sI2cTransfer.txCnt = STRUCTS_DECKEDREPLYTOTALSIZE;
+    
+    printf("[INFO] (%s) %s: Filled i2c Tx buffer with %d bytes\n", printTimestamp(), __func__, sI2cTransfer.txCnt);
+    printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sI2cTransfer.txBuf, sI2cTransfer.txCnt, true, ", "));
 }
 
 

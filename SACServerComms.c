@@ -45,6 +45,9 @@ uint32_t muiSeqNr = 0;
     msHttpTxMessage[HTTPMSGMAXSIZE] and sebsequently
     receives the response into 
     msHttpRxMessage[HTTPMSGMAXSIZE]
+    
+    Also parses the reply message payload into the global
+    sCtrlDeckedReply payload field.  
 ************************************************************/
 int httpSendRequest()
 {
@@ -287,7 +290,7 @@ Example server reply:
 ************************************************************/
 int httpParseReplyMsg(char *sRawMessage)
 {
-    int iInitLength = strlen(sRawMessage);
+    //int iInitLength = strlen(sRawMessage);
     int iNTokens = 0;
 	char asDelimiters[] = "\n";
     char *apLines[MAXSERVERREPLYLINES] = {NULL};
