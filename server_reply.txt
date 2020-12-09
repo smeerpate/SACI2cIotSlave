@@ -1,0 +1,543 @@
+48, 54, 54, 50, 2f, 31, 2e, 31, 20, 32, 30, 30, 20, 4f, 4b, 0d, 0a, 44, 61, 74, 
+65, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 
+31, 35, 3a, 34, 36, 3a, 31, 32, 20, 47, 4d, 54, 0d, 0a, 53, 65, 72, 76, 65, 72, 
+3a, 20, 41, 70, 61, 63, 68, 65, 2f, 32, 2e, 34, 2e, 32, 39, 20, 28, 55, 62, 75, 
+6e, 74, 75, 29, 0d, 0a, 43, 61, 63, 68, 65, 2d, 43, 6f, 6e, 74, 72, 6f, 6c, 3a, 
+20, 6d, 61, 78, 2d, 61, 67, 65, 3d, 30, 2c, 20, 6d, 75, 73, 74, 2d, 72, 65, 76, 
+61, 6c, 69, 64, 61, 74, 65, 2c, 20, 70, 72, 69, 76, 61, 74, 65, 0d, 0a, 45, 78, 
+70, 69, 72, 65, 73, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 
+30, 32, 30, 20, 31, 35, 3a, 34, 36, 3a, 31, 32, 20, 47, 4d, 54, 0d, 0a, 56, 61, 
+72, 79, 3a, 20, 41, 63, 63, 65, 70, 74, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 0d, 
+0a, 54, 72, 61, 6e, 73, 66, 65, 72, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 3a, 20, 
+63, 68, 75, 6e, 6b, 65, 64, 0d, 0a, 43, 6f, 6e, 74, 65, 6e, 74, 2d, 54, 79, 70, 
+65, 3a, 20, 74, 65, 78, 74, 2f, 68, 74, 6d, 6c, 3b, 20, 63, 68, 61, 72, 73, 65, 
+74, 3d, 55, 54, 46, 2d, 38, 0d, 0a, 0d, 0a, 31, 30, 0d, 0a, 33, 36, 33, 30, 31, 
+66, 37, 33, 64, 65, 61, 64, 62, 65, 65, 66, 0d, 0a, 30, 0d, 0a, 0d, 0a,
+
+
+
+48, 54, 54, 50, 2f, 31, 2e, 31, 20, 32, 30, 30, 20, 4f, 4b, 0d, 0a, 44, 61, 74, 65, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 35, 3a, 32, 30, 20, 47, 4d, 54, 0d, 0a, 53, 65, 72, 76, 65, 72, 3a, 20, 41, 70, 61, 63, 68, 65, 2f, 32, 2e, 34, 2e, 32, 39, 20, 28, 55, 62, 75, 6e, 74, 75, 29, 0d, 0a, 43, 61, 63, 68, 65, 2d, 43, 6f, 6e, 74, 72, 6f, 6c, 3a, 20, 6d, 61, 78, 2d, 61, 67, 65, 3d, 30, 2c, 20, 6d, 75, 73, 74, 2d, 72, 65, 76, 61, 6c, 69, 64, 61, 74, 65, 2c, 20, 70, 72, 69, 76, 61, 74, 65, 0d, 0a, 45, 78, 70, 69, 72, 65, 73, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 35, 3a, 32, 30, 20, 47, 4d, 54, 0d, 0a, 56, 61, 72, 79, 3a, 20, 41, 63, 63, 65, 70, 74, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 0d, 0a, 54, 72, 61, 6e, 73, 66, 65, 72, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 3a, 20, 63, 68, 75, 6e, 6b, 65, 64, 0d, 0a, 43, 6f, 6e, 74, 65, 6e, 74, 2d, 54, 79, 70, 65, 3a, 20, 74, 65, 78, 74, 2f, 68, 74, 6d, 6c, 3b, 20, 63, 68, 61, 72, 73, 65, 74, 3d, 55, 54, 46, 2d, 38, 0d, 0a, 0d, 0a, 31, 30, 0d, 0a, 31, 64, 33, 30, 31, 66, 37, 33, 64, 65, 61, 64, 62, 65, 65, 66, 0d, 0a, 30, 0d, 0a, 0d, 0a, 
+48, 54, 54, 50, 2f, 31, 2e, 31, 20, 32, 30, 30, 20, 4f, 4b, 00, 0a, 44, 61, 74, 65, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 35, 3a, 32, 30, 20, 47, 4d, 54, 00, 0a, 53, 65, 72, 76, 65, 72, 3a, 20, 41, 70, 61, 63, 68, 65, 2f, 32, 2e, 34, 2e, 32, 39, 20, 28, 55, 62, 75, 6e, 74, 75, 29, 00, 0a, 43, 61, 63, 68, 65, 2d, 43, 6f, 6e, 74, 72, 6f, 6c, 3a, 20, 6d, 61, 78, 2d, 61, 67, 65, 3d, 30, 2c, 20, 6d, 75, 73, 74, 2d, 72, 65, 76, 61, 6c, 69, 64, 61, 74, 65, 2c, 20, 70, 72, 69, 76, 61, 74, 65, 00, 0a, 45, 78, 70, 69, 72, 65, 73, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 35, 3a, 32, 30, 20, 47, 4d, 54, 00, 0a, 56, 61, 72, 79, 3a, 20, 41, 63, 63, 65, 70, 74, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 00, 0a, 54, 72, 61, 6e, 73, 66, 65, 72, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 3a, 20, 63, 68, 75, 6e, 6b, 65, 64, 00, 0a, 43, 6f, 6e, 74, 65, 6e, 74, 2d, 54, 79, 70, 65, 3a, 20, 74, 65, 78, 74, 2f, 68, 74, 6d, 6c, 3b, 20, 63, 68, 61, 72, 73, 65, 74, 3d, 55, 54, 46, 2d, 38, 00, 0a, 00, 0a, 31, 30, 00, 0a, 31, 64, 33, 30, 31, 66, 37, 33, 64, 65, 61, 64, 62, 65, 65, 66, 00, 0a, 30, 00, 0a, 00, 0a, 
+
+
+48, 54, 54, 50, 2f, 31, 2e, 31, 20, 32, 30, 30, 20, 4f, 4b, 0d, 0a, 44, 61, 74, 65, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 39, 3a, 30, 39, 20, 47, 4d, 54, 0d, 0a, 53, 65, 72, 76, 65, 72, 3a, 20, 41, 70, 61, 63, 68, 65, 2f, 32, 2e, 34, 2e, 32, 39, 20, 28, 55, 62, 75, 6e, 74, 75, 29, 0d, 0a, 43, 61, 63, 68, 65, 2d, 43, 6f, 6e, 74, 72, 6f, 6c, 3a, 20, 6d, 61, 78, 2d, 61, 67, 65, 3d, 30, 2c, 20, 6d, 75, 73, 74, 2d, 72, 65, 76, 61, 6c, 69, 64, 61, 74, 65, 2c, 20, 70, 72, 69, 76, 61, 74, 65, 0d, 0a, 45, 78, 70, 69, 72, 65, 73, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 39, 3a, 30, 39, 20, 47, 4d, 54, 0d, 0a, 56, 61, 72, 79, 3a, 20, 41, 63, 63, 65, 70, 74, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 0d, 0a, 54, 72, 61, 6e, 73, 66, 65, 72, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 3a, 20, 63, 68, 75, 6e, 6b, 65, 64, 0d, 0a, 43, 6f, 6e, 74, 65, 6e, 74, 2d, 54, 79, 70, 65, 3a, 20, 74, 65, 78, 74, 2f, 68, 74, 6d, 6c, 3b, 20, 63, 68, 61, 72, 73, 65, 74, 3d, 55, 54, 46, 2d, 38, 0d, 0a, 0d, 0a, 31, 30, 0d, 0a, 33, 36, 33, 30, 31, 66, 37, 33, 64, 65, 61, 64, 62, 65, 65, 66, 0d, 0a, 30, 0d, 0a, 0d, 0a, 
+48, 54, 54, 50, 2f, 31, 2e, 31, 20, 32, 30, 30, 20, 4f, 4b, 0d, 00, 44, 61, 74, 65, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 39, 3a, 30, 39, 20, 47, 4d, 54, 0d, 00, 53, 65, 72, 76, 65, 72, 3a, 20, 41, 70, 61, 63, 68, 65, 2f, 32, 2e, 34, 2e, 32, 39, 20, 28, 55, 62, 75, 6e, 74, 75, 29, 0d, 00, 43, 61, 63, 68, 65, 2d, 43, 6f, 6e, 74, 72, 6f, 6c, 3a, 20, 6d, 61, 78, 2d, 61, 67, 65, 3d, 30, 2c, 20, 6d, 75, 73, 74, 2d, 72, 65, 76, 61, 6c, 69, 64, 61, 74, 65, 2c, 20, 70, 72, 69, 76, 61, 74, 65, 0d, 00, 45, 78, 70, 69, 72, 65, 73, 3a, 20, 53, 61, 74, 2c, 20, 30, 35, 20, 44, 65, 63, 20, 32, 30, 32, 30, 20, 31, 36, 3a, 30, 39, 3a, 30, 39, 20, 47, 4d, 54, 0d, 00, 56, 61, 72, 79, 3a, 20, 41, 63, 63, 65, 70, 74, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 0d, 00, 54, 72, 61, 6e, 73, 66, 65, 72, 2d, 45, 6e, 63, 6f, 64, 69, 6e, 67, 3a, 20, 63, 68, 75, 6e, 6b, 65, 64, 0d, 00, 43, 6f, 6e, 74, 65, 6e, 74, 2d, 54, 79, 70, 65, 3a, 20, 74, 65, 78, 74, 2f, 68, 74, 6d, 6c, 3b, 20, 63, 68, 61, 72, 73, 65, 74, 3d, 55, 54, 46, 2d, 38, 0d, 00, 0d, 00, 31, 30, 0d, 00, 33, 36, 33, 30, 31, 66, 37, 33, 64, 65, 61, 64, 62, 65, 65, 66, 0d, 00, 30, 0d, 00, 0d, 00,
+
+
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 4 bytes
+        #(1874.592041) Bytes (HEX): 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.592041) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.596313) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.596313) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 14 bytes
+        #(1874.601440) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.601440) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 6 bytes
+        #(1874.601929) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.602173) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.606445) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.606445) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 7 bytes
+        #(1874.610840) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.610962) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 6 bytes
+        #(1874.611328) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.611328) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 8 bytes
+        #(1874.611938) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.612061) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.612183) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.612183) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 6 bytes
+        #(1874.612793) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.612915) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.617065) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.617188) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 8 bytes
+        #(1874.621094) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.621094) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 4 bytes
+        #(1874.621338) Bytes (HEX): 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.621338) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 8 bytes
+        #(1874.622070) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.622070) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.626465) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.626465) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 13 bytes
+        #(1874.631592) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.631592) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 7 bytes
+        #(1874.632080) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.632202) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.636597) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.636597) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 17 bytes
+        #(1874.641846) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.641968) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 4 bytes
+        #(1874.642212) Bytes (HEX): 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.642212) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.646484) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.646606) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 9 bytes
+        #(1874.651245) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.651367) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 10 bytes
+        #(1874.652100) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.652100) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.652466) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.652466) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.656738) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.656860) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 10 bytes
+        #(1874.661377) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.661499) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 10 bytes
+        #(1874.662231) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.662354) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.666748) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.666748) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 11 bytes
+        #(1874.671509) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.671631) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 6 bytes
+        #(1874.671997) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.672119) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 4 bytes
+        #(1874.672363) Bytes (HEX): 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.672363) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 4 bytes
+        #(1874.676880) Bytes (HEX): 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.677002) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 6 bytes
+        #(1874.677490) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.677490) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 5 bytes
+        #(1874.677856) Bytes (HEX): 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.677979) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.678101) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.678223) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 15 bytes
+        #(1874.683350) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.683472) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 6 bytes
+        #(1874.683960) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.683960) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.687256) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.687378) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 19 bytes
+        #(1874.692383) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.692383) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.692505) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.692505) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.696899) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.696899) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 7 bytes
+        #(1874.701416) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.701416) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.706909) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.706909) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.717651) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.717651) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.727295) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.727417) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.737671) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.737671) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.747925) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.748413) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.758179) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.758667) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.767944) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.768433) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.777954) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.778442) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.787964) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.788574) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.797974) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.798462) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.808716) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.809570) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.818115) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.818848) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.829468) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.830078) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.839355) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.840332) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.849121) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.849731) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.859253) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.860107) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 2 bytes
+        #(1874.868774) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.869629) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:25) listeningTask: Received 1 bytes
+        #(1874.879395) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:25) listeningTask: Parsing IoT header...
+        #(1874.880127) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.889526) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.890381) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.899170) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.899780) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1874.909180) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.910034) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.918701) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.919556) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.929932) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.930542) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.939819) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.940674) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1874.949585) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.950317) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.959595) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.960693) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.969116) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.969849) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.979492) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.979980) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1874.989990) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.990601) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1874.999146) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1874.999634) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.009521) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.010254) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.019897) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.020386) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.029297) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.029785) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.039429) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.040283) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.049683) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.050293) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.060181) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.060913) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.069092) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.069702) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.080200) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.080688) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.090576) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.091187) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.099609) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.100220) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.109863) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.110474) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.120239) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.120728) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.129639) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.130737) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.140259) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.141357) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.150635) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.151611) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.161133) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.162354) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.170532) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.171753) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.181030) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.182129) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.190552) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.191650) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.200928) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.201904) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.211426) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.212769) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.220825) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.222046) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.230347) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.231201) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 5 bytes
+        #(1875.236572) Bytes (HEX): 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.237061) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 23 bytes
+        #(1875.239136) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.239990) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.251587) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.252197) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 19 bytes
+        #(1875.255859) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.256714) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.257568) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.258423) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.260986) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.261719) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 14 bytes
+        #(1875.265747) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.266846) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 6 bytes
+        #(1875.267944) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.268921) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.271118) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.272095) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 20 bytes
+        #(1875.276367) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.277832) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.278931) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.280029) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.281494) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.282959) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 8 bytes
+        #(1875.285400) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.286743) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 12 bytes
+        #(1875.290161) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.291992) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.294189) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.295410) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 16 bytes
+        #(1875.296753) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.297974) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.301514) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.302124) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 15 bytes
+        #(1875.306030) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.306396) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 6 bytes
+        #(1875.307373) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.307495) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.310181) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.310425) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 19 bytes
+        #(1875.315552) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.315796) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 9 bytes
+        #(1875.316772) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.316895) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.320435) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.320557) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 14 bytes
+        #(1875.326172) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.326416) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 6 bytes
+        #(1875.327271) Bytes (HEX): 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.327393) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.331177) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.332642) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 17 bytes
+        #(1875.335327) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.335449) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 4 bytes
+        #(1875.335815) Bytes (HEX): 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.335938) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.340820) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.341064) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 18 bytes
+        #(1875.345825) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.346069) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 2 bytes
+        #(1875.346191) Bytes (HEX): 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.346313) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 1 bytes
+        #(1875.350952) Bytes (HEX): 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.351196) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 12 bytes
+        #(1875.354980) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.355103) IoT header: stx=0x00, cmdCode=0x00
+[INFO] (2020-12-07 20:35:26) listeningTask: Received 9 bytes
+        #(1875.355591) Bytes (HEX): 00, 00, 00, 00, 00, 00, 00, 00, 00,
+[INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
+        #(1875.355835) IoT header: stx=0x00, cmdCode=0x00
+^C2020-12-07 20:35:26 sigHandler: Unhandled signal 2, terminating

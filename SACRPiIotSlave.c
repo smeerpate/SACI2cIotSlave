@@ -119,7 +119,7 @@ void runSlave()
 void listeningTask()
 {
     //uint8_t bEtx;
-    static uint8_t bErrorResponse = 0x00;   
+    static uint8_t bErrorResponse = I2CERRORCODE_OK;   
     tCtrlSendCmd *pLastSendCommand = getLastSendCmd(); // get the address of the last saved send command
     tCtrlReadEnaCmd *pLastReadEnaCommand = getLastReadEnaCmd(); // get the address of the last saved read enable command
     
@@ -174,11 +174,13 @@ void listeningTask()
         
         case S_FLAGERROR_UNKNOWNCMD:
             printf("[ERROR] (%s) %s: Unknown cmdCode\n", printTimestamp(), __func__);
+            bErrorResponse = I2CERRORCODE_UNKNOWNCMD; // flag error
             sState = S_IDLE;
             break;
             
         case S_FLAGERROR_INVALIDSTX:
             printf("[ERROR] (%s) %s: Invalid start of transmission (STX) code\n", printTimestamp(), __func__);
+            bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
             sState = S_IDLE;
             break;
             
@@ -188,14 +190,17 @@ void listeningTask()
             if (pLastSendCommand->endTag == IOT_FRMENDTAG)
             {
                 // received correct ETX
-                bErrorResponse = 0x00;
+                bErrorResponse = I2CERRORCODE_OK;
                 // tell master to back off
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
                 bscXfer(&sI2cTransfer);
                 // try to send http request with payload
                 httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize - 1); // -1 since payloadsize includes the read request byte
-                httpSendRequest();
+                if(httpSendRequest() < 0)
                 // This might take a while ...
+                {
+                    bErrorResponse = I2CERRORCODE_SERVERUNREACH;
+                }
                 // tell master were back
                 sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
                 bscXfer(&sI2cTransfer);
@@ -203,7 +208,7 @@ void listeningTask()
             else
             {
                 // received incorrect ETX
-                bErrorResponse = 0x03; // flag invalid command error
+                bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
             }
             // were done with the received data reset Rx count
             sI2cTransfer.rxCnt = 0;
@@ -234,27 +239,13 @@ void listeningTask()
                 case 0x01:
                     // Master (i.e. SAC controller) DID ask for downlink data via i2c.
                     copyDeckedReplyToI2cTxBuffer(0x02, bErrorResponse);
-                    // sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
-                    // sI2cTransfer.txBuf[1] = 0x02;
-                    // sI2cTransfer.txBuf[2] = bErrorResponse;
-                    // sI2cTransfer.txBuf[3] = 0x08;
-                    // sI2cTransfer.txBuf[4] = 0x36;
-                    // sI2cTransfer.txBuf[5] = 0x30;
-                    // sI2cTransfer.txBuf[6] = 0x1f;
-                    // sI2cTransfer.txBuf[7] = 0x03;
-                    // sI2cTransfer.txBuf[8] = 0xBE;
-                    // sI2cTransfer.txBuf[9] = 0xEF;
-                    // sI2cTransfer.txBuf[10] = 0xBE;
-                    // sI2cTransfer.txBuf[11] = 0xEF;
-                    // sI2cTransfer.txBuf[12] = IOT_FRMENDTAG;
-                    // sI2cTransfer.txCnt = 13;
                     break;
                 default:
                     // unknown response code
                     printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator);
                     sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
-                    sI2cTransfer.txBuf[2] = 0x03;
+                    sI2cTransfer.txBuf[2] = I2CERRORCODE_INVALIDCMD;
                     sI2cTransfer.txBuf[3] = 0x00; // payload size = 0
                     sI2cTransfer.txBuf[4] = IOT_FRMENDTAG;
                     sI2cTransfer.txCnt = 5;

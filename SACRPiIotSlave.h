@@ -4,6 +4,15 @@
 #define I2CSALAVEADDRESS7       0x5F // SAC Iot i2c slave needs to be 0x5F (7bit address)
 #define I2CSALAVEADDRESS        (I2CSALAVEADDRESS7 << 1) // 8 bit address including R/W bit (0)
 
+#define I2CERRORCODE_OK             0x00
+#define I2CERRORCODE_CMDPROCESSING  0x01
+#define I2CERRORCODE_NOCMD          0x02
+#define I2CERRORCODE_INVALIDCMD     0x03
+#define I2CERRORCODE_UNKNOWNCMD     0x04
+#define I2CERRORCODE_UNEXPECTEDPLSZ 0x05
+#define I2CERRORCODE_RES            0x06
+#define I2CERRORCODE_SERVERUNREACH  0x07
+
 
 typedef union
 {

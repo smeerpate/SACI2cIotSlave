@@ -74,24 +74,57 @@ int httpSendRequest()
     {
         int iErrsv = SSL_get_error(sSSLConn, iResult);
         printf("[ERROR] (%s) %s: Could not create SSL connection. Error code %i. Return Code %i.\n\t%s\n", printTimestamp(), __func__, iErrsv, iResult, ERR_error_string(ERR_get_error(), NULL));
+        close(miHttpSocketFd);
         return -1;
     }
     #endif
     
     #if USESSL == 1
         /* send the request via SSL */
-        httpWriteMsgToSocket(0, sSSLConn);
+        iResult = httpWriteMsgToSocket(0, sSSLConn);
+        if (iResult < 0)
+        {
+            printf("[ERROR] (%s) %s: Could not write to SSL socket. Return Code = %i.\n", printTimestamp(), __func__, iResult);
+            close(miHttpSocketFd);
+            SSL_shutdown(sSSLConn);
+            return -1;
+        }
         /* receive the response via SSL */
-        httpReadRespFromSocket(0, sSSLConn);
+        iResult = httpReadRespFromSocket(0, sSSLConn);
+        if (iResult < 0)
+        {
+            printf("[ERROR] (%s) %s: Could not read from SSL socket. Return Code = %i.\n", printTimestamp(), __func__, iResult);
+            close(miHttpSocketFd);
+            SSL_shutdown(sSSLConn);
+            return -1;
+        }
         SSL_shutdown(sSSLConn);
     #else
         /* send the request */
-        httpWriteMsgToSocket(miHttpSocketFd, NULL);
+        iResult = httpWriteMsgToSocket(miHttpSocketFd, NULL);
+        if (iResult < 0)
+        {
+            printf("[ERROR] (%s) %s: Could not write to socket. Return Code = %i.\n", printTimestamp(), __func__, iResult);
+            close(miHttpSocketFd);
+            return -1;
+        }
         /* receive the response */
-        httpReadRespFromSocket(miHttpSocketFd, NULL);
+        iResult = httpReadRespFromSocket(miHttpSocketFd, NULL);
+        if (iResult < 0)
+        {
+            printf("[ERROR] (%s) %s: Could not read from socket. Return Code = %i.\n", printTimestamp(), __func__, iResult);
+            close(miHttpSocketFd);
+            return -1;
+        }
     #endif
     
-    httpParseReplyMsg(msHttpRxMessage);
+    iResult = httpParseReplyMsg(msHttpRxMessage);
+    if (iResult < 0)
+    {
+        printf("[ERROR] (%s) %s: Failed to parse the server\'s reply message. Return Code = %i.\n", printTimestamp(), __func__, iResult);
+        close(miHttpSocketFd);
+        return -1;
+    }
     
     close(miHttpSocketFd);
     return 0;
@@ -113,13 +146,13 @@ int httpSocketInit()
         miHttpPortNo = 80;
     #endif
     
-    msHttpHost = "dashboard.safeandclean.be";
+    msHttpHost = IOT_HOST;
     
     /* create the http socket */
     miHttpSocketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (miHttpSocketFd < 0)
     {
-        printf("[ERROR] (%s) %s: Failed to open socket\n", printTimestamp(), __func__);
+        printf("[ERROR] (%s) %s: Failed to open socket for \'%s\'\n", printTimestamp(), __func__, IOT_HOST);
         return -1;
     }
     
@@ -127,7 +160,7 @@ int httpSocketInit()
     msHttpServer = gethostbyname(msHttpHost);
     if (msHttpServer == NULL) 
     {
-        printf("[ERROR] (%s) %s: No such host: %s\n", printTimestamp(), __func__, msHttpHost);
+        printf("[ERROR] (%s) %s: No such host: \'%s\'\n", printTimestamp(), __func__, msHttpHost);
         return -1;
     }
     
