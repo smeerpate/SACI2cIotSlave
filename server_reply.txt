@@ -541,3 +541,171 @@
 [INFO] (2020-12-07 20:35:26) listeningTask: Parsing IoT header...
         #(1875.355835) IoT header: stx=0x00, cmdCode=0x00
 ^C2020-12-07 20:35:26 sigHandler: Unhandled signal 2, terminating
+
+
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Expires: Wed, 09 Dec 2020 16:57:03 GMT
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Vary: Accept-Encoding
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Transfer-Encoding: chunked
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Content-Type: text/html; charset=UTF-8
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 10
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 35291f03beefbabe
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 0
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******** ASCII end ********
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [28B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [48B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [43B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [63B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [51B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [34B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [39B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [51B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [13B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [15B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [29B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [14B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [13B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found reply code: 200
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found first blank line at substring index: 8
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found payload line at substring index 10 with content:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         35291f03beefbabe
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) httpParseReplyMsg: parsed 8 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         # Bytes (HEX): 35, 29, 1f, 03, be, ef, ba, be,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Received 4 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) Bytes (HEX): 23, 01, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) IoT header: stx=0x23, cmdCode=0x01
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: IoT read enable command: ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) httpParseReplyMsg: parsed 8 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         # Bytes (HEX): 35, 29, 1f, 03, be, ef, ba, be,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: Received 4 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2707.403320) Bytes (HEX): 23, 01, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2707.403320) IoT header: stx=0x23, cmdCode=0x01
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: IoT read enable command: ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: Building response for downlink indicator code 0x00 (error code = 0x00)
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) listeningTask: Received 17 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2816.850098) Bytes (HEX): 23, 02, 0d, 01, f2, fc, 2d, 13, c3, 00, 00, 00, 00, 00, 00, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2816.850098) IoT header: stx=0x23, cmdCode=0x02
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) listeningTask: IoT send command: payload size = 13, payload at 0x26220, ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) httpBuildRequestMsg: Built upstream data string:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         'f2fc2d13c300000000000000'
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [114B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) httpWriteMsgToSocket: 169 http request message bytes written to socket:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******* ASCII begin *******
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: GET /mobile/webhook?id=SC-4GTEST&time=1607533023&seqNumber=99&ack=1&data=f2fc2d13c300000000000000&response=35291f03beefbabe HTTP/1.1
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Host: dashboard.safeandclean.be
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******** ASCII end ********
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) httpReadRespFromSocket: 298 http request message bytes received in socket:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******* ASCII begin *******
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: HTTP/1.1 200 OK
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Date: Wed, 09 Dec 2020 16:57:03 GMT
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Server: Apache/2.4.29 (Ubuntu)
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Cache-Control: max-age=0, must-revalidate, private
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Expires: Wed, 09 Dec 2020 16:57:03 GMT
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Vary: Accept-Encoding
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Transfer-Encoding: chunked
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Content-Type: text/html; charset=UTF-8
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 10
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 35291f03beefbabe
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 0
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******** ASCII end ********
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [28B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [48B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [43B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [63B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [51B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [34B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [39B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [51B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [13B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [15B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [29B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [14B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [13B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found reply code: 200
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found first blank line at substring index: 8
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found payload line at substring index 10 with content:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         35291f03beefbabe
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) httpParseReplyMsg: parsed 8 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         # Bytes (HEX): 35, 29, 1f, 03, be, ef, ba, be,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Received 4 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) Bytes (HEX): 23, 01, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) IoT header: stx=0x23, cmdCode=0x01
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: IoT read enable command: ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) httpParseReplyMsg: parsed 8 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         # Bytes (HEX): 35, 29, 1f, 03, be, ef, ba, be,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: Received 4 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2707.403320) Bytes (HEX): 23, 01, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2707.403320) IoT header: stx=0x23, cmdCode=0x01
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: IoT read enable command: ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:55:13) listeningTask: Building response for downlink indicator code 0x00 (error code = 0x00)
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) listeningTask: Received 17 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2816.850098) Bytes (HEX): 23, 02, 0d, 01, f2, fc, 2d, 13, c3, 00, 00, 00, 00, 00, 00, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2816.850098) IoT header: stx=0x23, cmdCode=0x02
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) listeningTask: IoT send command: payload size = 13, payload at 0x26220, ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) httpBuildRequestMsg: Built upstream data string:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         'f2fc2d13c300000000000000'
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [114B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:03) httpWriteMsgToSocket: 169 http request message bytes written to socket:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******* ASCII begin *******
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: GET /mobile/webhook?id=SC-4GTEST&time=1607533023&seqNumber=99&ack=1&data=f2fc2d13c300000000000000&response=35291f03beefbabe HTTP/1.1
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Host: dashboard.safeandclean.be
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******** ASCII end ********
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) httpReadRespFromSocket: 298 http request message bytes received in socket:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******* ASCII begin *******
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: HTTP/1.1 200 OK
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Date: Wed, 09 Dec 2020 16:57:03 GMT
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Server: Apache/2.4.29 (Ubuntu)
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Cache-Control: max-age=0, must-revalidate, private
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Expires: Wed, 09 Dec 2020 16:57:03 GMT
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Vary: Accept-Encoding
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Transfer-Encoding: chunked
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: Content-Type: text/html; charset=UTF-8
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 10
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 35291f03beefbabe
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: 0
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [1B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: ******** ASCII end ********
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [28B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [48B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [43B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [63B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [51B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [34B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [39B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [51B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [13B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [15B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [29B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [14B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [13B blob data]
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found reply code: 200
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found first blank line at substring index: 8
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] httpParseReplyMsg: Found payload line at substring index 10 with content:
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         35291f03beefbabe
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) httpParseReplyMsg: parsed 8 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         # Bytes (HEX): 35, 29, 1f, 03, be, ef, ba, be,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Received 4 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) Bytes (HEX): 23, 01, 00, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) IoT header: stx=0x23, cmdCode=0x01
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: IoT read enable command: ETX = 0xa
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) listeningTask: Building response for downlink indicator code 0x01 (error code = 0x00)
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:57:08) copyDeckedReplyToI2cTxBuffer: Filled i2c Tx buffer with 13 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2822.104004) Bytes (HEX): 23, 02, 00, 08, 35, 29, 1f, 03, be, ef, ba, be, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:59:03) listeningTask: Received 17 bytes
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2936.877197) Bytes (HEX): 23, 02, 0d, 00, 01, 00, 00, 00, 00, 1f, c6, 35, 29, 1f, ff, ff, 0a,
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]: [INFO] (2020-12-09 16:59:03) listeningTask: Parsing IoT header...
+Dec 09 16:59:03 CAERUS-CONTROL-1034 SACIotSlave[570]:         #(2936.877197) IoT header: stx=0x23, cmdCode=0x02
+en dan was het over en uit. de I2C data lijn bleef aan massa plakken.
