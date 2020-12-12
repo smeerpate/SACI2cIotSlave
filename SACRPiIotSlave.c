@@ -168,19 +168,31 @@ void listeningTask()
             else
             {
                 // invalid stx
-                sState = S_IDLE;
+                sState = S_FLAGERROR_INVALIDSTX;
             }
             break;
         
         case S_FLAGERROR_UNKNOWNCMD:
             printf("[ERROR] (%s) %s:(S_FLAGERROR_UNKNOWNCMD) Unknown cmdCode\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_UNKNOWNCMD; // flag error
+            // Discard received data reset Rx count
+            sI2cTransfer.rxCnt = 0;
             sState = S_IDLE;
             break;
             
         case S_FLAGERROR_INVALIDSTX:
             printf("[ERROR] (%s) %s:(S_FLAGERROR_INVALIDSTX) Invalid start of transmission (STX) code\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
+            // Discard received data reset Rx count
+            sI2cTransfer.rxCnt = 0;
+            sState = S_IDLE;
+            break;
+            
+        case S_FLAGERROR_INVALIDETX:
+            printf("[ERROR] (%s) %s:(S_FLAGERROR_INVALIDETX) Invalid end of transmission (ETX) code\n", printTimestamp(), __func__);
+            bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
+            // Discard received data reset Rx count
+            sI2cTransfer.rxCnt = 0;
             sState = S_IDLE;
             break;
             
@@ -191,28 +203,30 @@ void listeningTask()
             {
                 // received correct ETX
                 bErrorResponse = I2CERRORCODE_OK;
-                // tell master to back off
-                sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
-                bscXfer(&sI2cTransfer);
-                // try to send http request with payload
-                httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize - 1); // -1 since payloadsize includes the read request byte
-                if(httpSendRequest() < 0)
-                // This might take a while ...
-                {
-                    bErrorResponse = I2CERRORCODE_SERVERUNREACH;
-                }
-                // tell master were back
-                sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
-                bscXfer(&sI2cTransfer);
+                sState = S_DISSABLEI2CPERIPH;
+                // // tell master to back off
+                // sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
+                // bscXfer(&sI2cTransfer);
+                // // try to send http request with payload
+                // httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize - 1); // -1 since payloadsize includes the read request byte
+                // if(httpSendRequest() < 0)
+                // // This might take a while ...
+                // {
+                    // bErrorResponse = I2CERRORCODE_SERVERUNREACH;
+                // }
+                // // tell master were back
+                // sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
+                // bscXfer(&sI2cTransfer);
             }
             else
             {
-                // received incorrect ETX
-                bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
+                // // received incorrect ETX
+                // bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
+                sState = S_FLAGERROR_INVALIDETX;
             }
-            // were done with the received data reset Rx count
-            sI2cTransfer.rxCnt = 0;
-            sState = S_IDLE;
+            // // were done with the received data reset Rx count
+            // sI2cTransfer.rxCnt = 0;
+            // sState = S_IDLE;
             break;
             
            
@@ -253,6 +267,38 @@ void listeningTask()
             }
             sI2cStatus.i32 = bscXfer(&sI2cTransfer);
             sI2cTransfer.txCnt = 0; // set the fifo pointer to 0. Important to set this so master can read the right data.
+            sState = S_IDLE;
+            break;
+        
+        case S_DISSABLEI2CPERIPH:
+            // tell master to back off
+            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Disabling I2C slave peripheral...\n", printTimestamp(), __func__);
+            sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
+            bscXfer(&sI2cTransfer);
+            sState = S_SENDHTTPREQUEST;
+            break;
+            
+        case S_SENDHTTPREQUEST:
+            // try to send http request with payload
+            printf("[INFO] (%s) %s:(S_SENDHTTPREQUEST) Sending HTTP request.\n", printTimestamp(), __func__);
+            httpBuildRequestMsg((uint32_t)pLastSendCommand->payload, pLastSendCommand->payloadSize - 1); // -1 since payloadsize includes the read request byte
+            if(httpSendRequest() < 0)
+            // This might take a while ...
+            {
+                bErrorResponse = I2CERRORCODE_SERVERUNREACH;
+            }
+            
+            // were done with the received data reset Rx count
+            sI2cTransfer.rxCnt = 0;
+            
+            sState = S_ENABLEI2CPERIPH;
+            break;
+            
+        case S_ENABLEI2CPERIPH:
+            // tell master were back
+            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Enabling I2C slave peripheral...\n", printTimestamp(), __func__);
+            sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
+            bscXfer(&sI2cTransfer);
             sState = S_IDLE;
             break;
             
