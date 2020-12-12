@@ -139,14 +139,14 @@ void listeningTask()
             }
             else
             {
-                printf("[INFO] (%s) %s: Received %d bytes\n", printTimestamp(), __func__, sI2cTransfer.rxCnt);
+                printf("[INFO] (%s) %s:(S_IDLE) Received %d bytes\n", printTimestamp(), __func__, sI2cTransfer.rxCnt);
                 printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sI2cTransfer.rxBuf, sI2cTransfer.rxCnt, true, ", "));
                 sState = S_PARSEIOTHEADER;
             }
             break;
             
         case S_PARSEIOTHEADER:
-            printf("[INFO] (%s) %s: Parsing IoT header...\n", printTimestamp(), __func__);
+            printf("[INFO] (%s) %s:(S_PARSEIOTHEADER) Parsing IoT header...\n", printTimestamp(), __func__);
             tIotCmdHeader* pIotCmdHeader = (tIotCmdHeader*)sI2cTransfer.rxBuf;
             printf("\t#(%f) IoT header: stx=0x%02x, cmdCode=0x%02x\n", getTickSec(), pIotCmdHeader->startTag, pIotCmdHeader->cmdCode);
             if(pIotCmdHeader->startTag == IOT_FRMSTARTTAG)
@@ -173,20 +173,20 @@ void listeningTask()
             break;
         
         case S_FLAGERROR_UNKNOWNCMD:
-            printf("[ERROR] (%s) %s: Unknown cmdCode\n", printTimestamp(), __func__);
+            printf("[ERROR] (%s) %s:(S_FLAGERROR_UNKNOWNCMD) Unknown cmdCode\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_UNKNOWNCMD; // flag error
             sState = S_IDLE;
             break;
             
         case S_FLAGERROR_INVALIDSTX:
-            printf("[ERROR] (%s) %s: Invalid start of transmission (STX) code\n", printTimestamp(), __func__);
+            printf("[ERROR] (%s) %s:(S_FLAGERROR_INVALIDSTX) Invalid start of transmission (STX) code\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
             sState = S_IDLE;
             break;
             
         case S_PARSECMDSEND:            
             pLastSendCommand = setLastSendCmd((void *)&sI2cTransfer.rxBuf[0]);
-            printf("[INFO] (%s) %s: IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, pLastSendCommand->payloadSize, (uint32_t)pLastSendCommand->payload, pLastSendCommand->endTag);
+            printf("[INFO] (%s) %s:(S_PARSECMDSEND) IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, pLastSendCommand->payloadSize, (uint32_t)pLastSendCommand->payload, pLastSendCommand->endTag);
             if (pLastSendCommand->endTag == IOT_FRMENDTAG)
             {
                 // received correct ETX
@@ -218,13 +218,13 @@ void listeningTask()
            
         case S_PARSECMDREADENA:
             pLastReadEnaCommand = setLastReadEnaCmd((void *)&sI2cTransfer.rxBuf[0]);
-            printf("[INFO] (%s) %s: IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, pLastReadEnaCommand->endTag);
+            printf("[INFO] (%s) %s:(S_PARSECMDREADENA) IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, pLastReadEnaCommand->endTag);
             sState = S_BUILDRESPONSE;
             break;
             
 
         case S_BUILDRESPONSE:
-            printf("[INFO] (%s) %s: Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator, bErrorResponse);
+            printf("[INFO] (%s) %s:(S_BUILDRESPONSE) Building response for downlink indicator code 0x%02x (error code = 0x%02x)\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator, bErrorResponse);
             switch(pLastSendCommand->downlinkIndicator)
             {
                 case 0x00:
@@ -242,7 +242,7 @@ void listeningTask()
                     break;
                 default:
                     // unknown response code
-                    printf("[ERROR] (%s) %s: Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator);
+                    printf("[ERROR] (%s) %s:(S_BUILDRESPONSE) Invalid downlink indicator code 0x%02x\n", printTimestamp(), __func__, pLastSendCommand->downlinkIndicator);
                     sI2cTransfer.txBuf[0] = IOT_FRMSTARTTAG;
                     sI2cTransfer.txBuf[1] = 0x02;
                     sI2cTransfer.txBuf[2] = I2CERRORCODE_INVALIDCMD;
@@ -316,6 +316,21 @@ int getControlBits(int address /* 7 bit address */, bool open, bool rxEnable) {
         flags = /*RE:*/ (1 << 9) | /*TE:*/ (1 << 8) | /*I2:*/ iI2 | /*EN:*/ iEN;
     else // Close/Abort
         flags = /*BK:*/ (1 << 7) | /*I2:*/ (0 << 2) | /*EN:*/ (0 << 0);
+        
+    // int iRE = 0;
+    // if(rxEnable)
+    // {
+        // iRE = (1 << 9);
+    // }
+    // else
+    // {
+        // iRE = (0 << 9);
+    // }
+    
+    // if(open)
+        // flags = /*RE:*/ iRE | /*TE:*/ (1 << 8) | /*I2:*/ (1 << 2) | /*EN:*/ (1 << 0);
+    // else // Close/Abort
+        // flags = /*BK:*/ (1 << 7) | /*I2:*/ (0 << 2) | /*EN:*/ (0 << 0);
 
     return (address << 16 /*= to the start of significant bits*/) | flags;
 }
