@@ -267,7 +267,11 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
     *) Is required for int httpSendRequest().
 ************************************************************/
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
-{   
+{
+    char sDeviceId[256];
+    gethostname(sDeviceId, 256);
+    printf("[INFO] (%s) %s: Device ID is \'%s\'.\n", printTimestamp(), __func__, sDeviceId);
+    
     char *pUpstreamDataString = printBytesAsHexString(I2CRxPayloadAddress, I2CRxPayloadLength, false, NULL);
     printf("[INFO] (%s) %s: Built upstream data string:\n\t\'%s\'\n", printTimestamp(), __func__, pUpstreamDataString);
     
@@ -275,6 +279,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     sprintf(sRequest->host, "%s", IOT_HOST);
     sprintf(sRequest->path, "%s", IOT_PATH);
     sprintf(sRequest->deviceId, "%s", IOT_DEVICEID);
+    //sprintf(sRequest->deviceId, "%s", sDeviceId);
     sRequest->time = printGetUnixEpochTimeAsInt();//1594998140;
     sRequest->seqNr = muiSeqNr;
     muiSeqNr += 1;

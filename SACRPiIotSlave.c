@@ -272,9 +272,10 @@ void listeningTask()
         
         case S_DISSABLEI2CPERIPH:
             // tell master to back off
-            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Disabling I2C slave peripheral...\n", printTimestamp(), __func__);
+            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Disabling I2C slave peripheral...", printTimestamp(), __func__);
             sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
             bscXfer(&sI2cTransfer);
+            printf(" CR=0x%08x\n", getRawBCSCReg(3));
             sState = S_SENDHTTPREQUEST;
             break;
             
@@ -296,9 +297,10 @@ void listeningTask()
             
         case S_ENABLEI2CPERIPH:
             // tell master were back
-            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Enabling I2C slave peripheral...\n", printTimestamp(), __func__);
+            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Enabling I2C slave peripheral...", printTimestamp(), __func__);
             sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
             bscXfer(&sI2cTransfer);
+            printf(" CR=0x%08x\n", getRawBCSCReg(3));
             sState = S_IDLE;
             break;
             
