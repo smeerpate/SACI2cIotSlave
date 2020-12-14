@@ -130,6 +130,10 @@ void listeningTask()
     {
         case S_IDLE:
             sI2cStatus.i32 = bscXfer(&sI2cTransfer);
+            if(sI2cStatus.i32 == -1)
+            {
+                printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
+            }
             sI2cTransfer.txCnt = 0; // set the fifo pointer to 0
             if(sI2cTransfer.rxCnt == 0 || sI2cStatus.rxBusy == 1)
             {
@@ -266,6 +270,10 @@ void listeningTask()
                     break;
             }
             sI2cStatus.i32 = bscXfer(&sI2cTransfer);
+            if(sI2cStatus.i32 == -1)
+            {
+                printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
+            }
             sI2cTransfer.txCnt = 0; // set the fifo pointer to 0. Important to set this so master can read the right data.
             sState = S_IDLE;
             break;
@@ -274,8 +282,12 @@ void listeningTask()
             // tell master to back off
             printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Disabling I2C slave peripheral...", printTimestamp(), __func__);
             sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
-            bscXfer(&sI2cTransfer);
+            sI2cStatus.i32 = bscXfer(&sI2cTransfer);
             printf(" CR=0x%08x\n", getRawBCSCReg(3));
+            if(sI2cStatus.i32 == -1)
+            {
+                printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
+            }
             sState = S_SENDHTTPREQUEST;
             break;
             
@@ -299,8 +311,12 @@ void listeningTask()
             // tell master were back
             printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Enabling I2C slave peripheral...", printTimestamp(), __func__);
             sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
-            bscXfer(&sI2cTransfer);
+            sI2cStatus.i32 = bscXfer(&sI2cTransfer);
             printf(" CR=0x%08x\n", getRawBCSCReg(3));
+            if(sI2cStatus.i32 == -1)
+            {
+                printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
+            }
             sState = S_IDLE;
             break;
             
