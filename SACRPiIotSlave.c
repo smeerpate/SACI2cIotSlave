@@ -49,7 +49,7 @@ typedef struct
     char txBuf[BSC_FIFO_SIZE]; // Write
 } bsc_xfer_t;
 */
-bsc_xfer_t sI2cTransfer; // i2c transfer struct
+volatile bsc_xfer_t sI2cTransfer; // i2c transfer struct
 volatile tBscStatus sI2cStatus;
 tSmState sState = S_IDLE;
 /****************************************************/
