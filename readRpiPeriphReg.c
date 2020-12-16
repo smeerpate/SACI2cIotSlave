@@ -1,3 +1,10 @@
+/*
+    Compile met:
+    gcc -Wall -pthread -o readRpiPeriphReg readRpiPeriphReg.c
+
+*/
+
+
 #define BCM2708_PERI_BASE          0x3F000000
 #define GPIO_BASE                (BCM2708_PERI_BASE + 0x214000) /* SPI/BSC slave */
 
