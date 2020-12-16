@@ -72,7 +72,7 @@ void SIGHandler(int signum);
 /****************** Implementation ******************/
 uint8_t slave_init()
 {
-    int iResult = gpioInitialise();
+    int iResult = 0;//gpioInitialise();
     if(iResult < 0)
     {
         printf("[ERROR] (%s) %s: Error while initializing GPIOs. Return code = %i.\n", printTimestamp(), __func__, iResult);
@@ -83,11 +83,15 @@ uint8_t slave_init()
         printf("[INFO] (%s) %s: Initialized GPIOs\n", printTimestamp(), __func__);
     }
     // Close old device (if any)
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false); // To avoid conflicts when restarting
-    bscXfer(&sI2cTransfer);
+    //sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false); // To avoid conflicts when restarting
+    //bscXfer(&sI2cTransfer);
+    
+    // Set GPIO MUXes
+    slavedriverInitGpioMUX();
     // Set I2C slave Address
     printf("[INFO] (%s) %s: Setting I2C slave address to 0x%02x\n", printTimestamp(), __func__, I2CSALAVEADDRESS7);
     slavedriverSetI2cAddress(I2CSALAVEADDRESS7);
+    slavedriverGetI2cAddress(NULL);
     //sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
     //iResult = bscXfer(&sI2cTransfer); // Should now be visible in I2C-Scanners
     return iResult;
@@ -451,8 +455,9 @@ int main(int argc, char* argv[]){
     #if USESSL == 1
         sslInit();
     #endif
-    runSlave();
-    closeSlave();
+    slave_init();
+    //runSlave();
+    //closeSlave();
     sslClose();
     return 0;
 }

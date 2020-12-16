@@ -200,7 +200,28 @@ typedef union
 } tSpiBcsPeriphRegDEBUG2;
 
 
+typedef union
+{
+    struct
+    {
+        uint32_t fSelx0         : 3; // 0,1,2
+        uint32_t fSelx1         : 3; // 3,4,5
+        uint32_t fSelx2         : 3; // 6,7,8
+        uint32_t fSelx3         : 3; // 9,10,11
+        uint32_t fSelx4         : 3; // 12,13,14
+        uint32_t fSelx5         : 3; // 15,16,17
+        uint32_t fSelx6         : 3; // 18,19,20
+        uint32_t fSelx7         : 3; // 21,22,23
+        uint32_t fSelx8         : 3; // 24,25,26
+        uint32_t fSelx9         : 3; // 27,28,29
+        uint32_t reserved       : 2; // 30,31
+    };
+    uint32_t u32;
+} tGpioPeriphRegGPFSET;
+
+
 int slavedriverSetI2cAddress(uint8_t bAddress);
 int slavedriverGetI2cAddress(uint8_t *bAddress);
+int slavedriverInitGpioMUX();
 
 #endif
