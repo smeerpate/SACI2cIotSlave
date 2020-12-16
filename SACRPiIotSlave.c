@@ -34,6 +34,7 @@
 #include "SACServerComms.h"
 #include "SACPrintUtils.h"
 #include "SACStructs.h"
+#include "SACI2cDriver.h"
 
 /********************** Globals *********************/
 uint32_t uSleepMicrosec = 1000; // number of micro seconds to sleep if no i2c transaction received. 32bytes take about 3.2ms to transmit.
@@ -86,8 +87,9 @@ uint8_t slave_init()
     bscXfer(&sI2cTransfer);
     // Set I2C slave Address
     printf("[INFO] (%s) %s: Setting I2C slave address to 0x%02x\n", printTimestamp(), __func__, I2CSALAVEADDRESS7);
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
-    iResult = bscXfer(&sI2cTransfer); // Should now be visible in I2C-Scanners
+    slavedriverSetI2cAddress(I2CSALAVEADDRESS7);
+    //sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
+    //iResult = bscXfer(&sI2cTransfer); // Should now be visible in I2C-Scanners
     return iResult;
 }
 

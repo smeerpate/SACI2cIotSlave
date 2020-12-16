@@ -199,4 +199,8 @@ typedef union
     uint32_t u32;
 } tSpiBcsPeriphRegDEBUG2;
 
+
+int slavedriverSetI2cAddress(uint8_t bAddress);
+int slavedriverGetI2cAddress(uint8_t *bAddress);
+
 #endif
