@@ -81,6 +81,20 @@ uint8_t slave_init()
     {
         printf("[INFO] (%s) %s: Initialized GPIOs\n", printTimestamp(), __func__);
     }
+    // Disable pull ups and pull downs on GPIO18 and GPIO19
+    printf("[INFO] (%s) %s: Disabling GPIO pull-ups/downs.\n", printTimestamp(), __func__);
+    gpioSetPullUpDown(18, PI_PUD_OFF);
+    gpioSetPullUpDown(19, PI_PUD_OFF);
+    // Set ALT function ALT3 on GPIO18 and GPIO19
+    printf("[INFO] (%s) %s: Setting GPIO 18 & 19 to ALT3 (SPI/BSC slave).\n", printTimestamp(), __func__);
+    if (gpioGetMode(18) != PI_ALT3)
+    {
+       gpioSetMode(18, PI_ALT3);  // set GPIO17 to ALT0
+    }
+    if (gpioGetMode(19) != PI_ALT3)
+    {
+       gpioSetMode(19, PI_ALT3);  // set GPIO17 to ALT0
+    }
     // Close old device (if any)
     sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false); // To avoid conflicts when restarting
     bscXfer(&sI2cTransfer);
@@ -280,14 +294,14 @@ void listeningTask()
         
         case S_DISSABLEI2CPERIPH:
             // tell master to back off
-            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Disabling I2C slave peripheral...", printTimestamp(), __func__);
-            sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
-            sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-            printf(" CR=0x%08x\n", getRawBCSCReg(3));
-            if(sI2cStatus.i32 == -1)
-            {
-                printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
-            }
+            // printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Disabling I2C slave peripheral...", printTimestamp(), __func__);
+            // sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, false);
+            // sI2cStatus.i32 = bscXfer(&sI2cTransfer);
+            // printf(" CR=0x%08x\n", getRawBCSCReg(3));
+            // if(sI2cStatus.i32 == -1)
+            // {
+                // printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
+            // }
             sState = S_SENDHTTPREQUEST;
             break;
             
@@ -309,14 +323,14 @@ void listeningTask()
             
         case S_ENABLEI2CPERIPH:
             // tell master were back
-            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Enabling I2C slave peripheral...", printTimestamp(), __func__);
-            sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
-            sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-            printf(" CR=0x%08x\n", getRawBCSCReg(3));
-            if(sI2cStatus.i32 == -1)
-            {
-                printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
-            }
+            // printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Enabling I2C slave peripheral...", printTimestamp(), __func__);
+            // sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
+            // sI2cStatus.i32 = bscXfer(&sI2cTransfer);
+            // printf(" CR=0x%08x\n", getRawBCSCReg(3));
+            // if(sI2cStatus.i32 == -1)
+            // {
+                // printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
+            // }
             sState = S_IDLE;
             break;
             
