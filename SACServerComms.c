@@ -170,7 +170,7 @@ int httpSocketInit()
     msHttpServerAddr.sin_port = htons(miHttpPortNo);
     memcpy(&msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
     
-    printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_addr=%s, h_length=0x%x\n", printTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_addr, msHttpServer->h_length);
+    printf("[INFO] (%s) %s: Initialized http socket: s_addr=0x%x, h_length=0x%x\n", printTimestamp(), __func__, msHttpServerAddr.sin_addr.s_addr, msHttpServer->h_length);
     
     return 0;
 }
