@@ -20,7 +20,7 @@
         gcc -Wall -pthread -o SACRPiIotSlave SACRPiIotSlave.c -lpigpio -lrt -lssl -lcrypto
 */
 
-#include <pigpio.h>
+//#include <pigpio.h>
 #include "stdio.h"
 #include <stdlib.h>
 #include "string.h" /* memcpy, memset */
@@ -29,6 +29,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "SACRPiIotSlave.h"
 #include "SACServerComms.h"
@@ -41,22 +42,7 @@
 
 /********************** Globals *********************/
 uint32_t uSleepMicrosec = 1000; // number of micro seconds to sleep if no i2c transaction received. 32bytes take about 3.2ms to transmit.
-/* i2c transfer struct
-bsc_xfer:= a structure defining the transfer
-
-typedef struct
-{
-    uint32_t control;          // Write
-    int rxCnt;                 // Read only
-    char rxBuf[BSC_FIFO_SIZE]; // Read only
-    int txCnt;                 // Write
-    char txBuf[BSC_FIFO_SIZE]; // Write
-} bsc_xfer_t;
-*/
-volatile bsc_xfer_t sI2cTransfer; // i2c transfer struct
-volatile tBscStatus sI2cStatus;
 tSmState sState = S_IDLE;
-
 volatile serial_xfer_t sSerialTransfer;
 /****************************************************/
 
@@ -79,39 +65,16 @@ void SIGHandler(int signum);
 /****************** Implementation ******************/
 uint8_t slave_init()
 {
-    serialInit();
-    
-    int iResult = gpioInitialise();
+    int iResult = serialInit();
     if(iResult < 0)
     {
-        printf("[ERROR] (%s) %s: Error while initializing GPIOs. Return code = %i.\n", printTimestamp(), __func__, iResult);
+        printf("[ERROR] (%s) %s: Error while initializing serial port. Return code = %i.\n", printTimestamp(), __func__, iResult);
         exit(1);
     }
     else
     {
-        printf("[INFO] (%s) %s: Initialized GPIOs\n", printTimestamp(), __func__);
+        printf("[INFO] (%s) %s: Initialized serial port.\n", printTimestamp(), __func__);
     }
-    // Disable pull ups and pull downs on GPIO18 and GPIO19
-    printf("[INFO] (%s) %s: Disabling GPIO pull-ups/downs.\n", printTimestamp(), __func__);
-    gpioSetPullUpDown(18, PI_PUD_OFF);
-    gpioSetPullUpDown(19, PI_PUD_OFF);
-    // Set ALT function ALT3 on GPIO18 and GPIO19
-    printf("[INFO] (%s) %s: Setting GPIO 18 & 19 to ALT3 (SPI/BSC slave).\n", printTimestamp(), __func__);
-    if (gpioGetMode(18) != PI_ALT3)
-    {
-       gpioSetMode(18, PI_ALT3);  // set GPIO17 to ALT0
-    }
-    if (gpioGetMode(19) != PI_ALT3)
-    {
-       gpioSetMode(19, PI_ALT3);  // set GPIO17 to ALT0
-    }
-    // Close old device (if any)
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false); // To avoid conflicts when restarting
-    bscXfer(&sI2cTransfer);
-    // Set I2C slave Address
-    printf("[INFO] (%s) %s: Setting I2C slave address to 0x%02x\n", printTimestamp(), __func__, I2CSALAVEADDRESS7);
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, true, true);
-    iResult = bscXfer(&sI2cTransfer); // Should now be visible in I2C-Scanners
     return iResult;
 }
 
@@ -121,12 +84,8 @@ void runSlave()
     iStatus = slave_init(); // TODO: Might be a problem when pigpio deaman 
     if(iStatus >= 0)
     {
-        // Successfully opened i2c slave
-        printf("[INFO] (%s) %s: Successfully opened i2c slave. Status = %i.\n", printTimestamp(), __func__, iStatus);
-        printf("[INFO] (%s) %s: FIFO size is %i bytes\n", printTimestamp(), __func__, BSC_FIFO_SIZE);
-        sI2cTransfer.rxCnt = 0;
-        sI2cStatus.txBusy = 0;
-        sI2cStatus.rxBusy = 0;
+        // Successfully opened serial port
+        printf("[INFO] (%s) %s: Successfully opened serial port. Status = %i.\n", printTimestamp(), __func__, iStatus);
         // Start listening...
         while(1)
         {
@@ -305,75 +264,9 @@ void listeningTask()
 
 float getTickSec()
 {
-    return ((float)gpioTick() * 1.0e-6); 
+    return 0;//((float)gpioTick() * 1.0e-6); 
 }
 
-
-int getControlBits(int address /* 7 bit address */, bool open, bool rxEnable) {
-    /*
-    Excerpt from http://abyz.me.uk/rpi/pigpio/cif.html#bscXfer regarding the control bits:
-
-    22 21 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
-    a  a  a  a  a  a  a  -  -  IT HC TF IR RE TE BK EC ES PL PH I2 SP EN
-
-    Bits 0-13 are copied unchanged to the BSC CR register. See pages 163-165 of the Broadcom 
-    peripherals document for full details. 
-
-    aaaaaaa defines the I2C slave address (only relevant in I2C mode)
-    IT  invert transmit status flags
-    HC  enable host control
-    TF  enable test FIFO
-    IR  invert receive status flags
-    RE  enable receive
-    TE  enable transmit
-    BK  abort operation and clear FIFOs
-    EC  send control register as first I2C byte
-    ES  send status register as first I2C byte
-    PL  set SPI polarity high
-    PH  set SPI phase high
-    I2  enable I2C mode
-    SP  enable SPI mode
-    EN  enable BSC peripheral
-    */
-
-    // Flags like this: 0b/*IT:*/0/*HC:*/0/*TF:*/0/*IR:*/0/*RE:*/0/*TE:*/0/*BK:*/0/*EC:*/0/*ES:*/0/*PL:*/0/*PH:*/0/*I2:*/0/*SP:*/0/*EN:*/0;
-
-    int flags;
-    int iEN = 0;
-    int iI2 = 0;
-    if(rxEnable)
-    {
-        iEN = (1 << 0);
-        iI2 = (1 << 2);
-    }
-    else
-    {
-        iEN = (0 << 0);
-        iI2 = (0 << 2);
-    }
-    
-    if(open)
-        flags = /*RE:*/ (1 << 9) | /*TE:*/ (1 << 8) | /*I2:*/ iI2 | /*EN:*/ iEN;
-    else // Close/Abort
-        flags = /*BK:*/ (1 << 7) | /*I2:*/ (0 << 2) | /*EN:*/ (0 << 0);
-        
-    // int iRE = 0;
-    // if(rxEnable)
-    // {
-        // iRE = (1 << 9);
-    // }
-    // else
-    // {
-        // iRE = (0 << 9);
-    // }
-    
-    // if(open)
-        // flags = /*RE:*/ iRE | /*TE:*/ (1 << 8) | /*I2:*/ (1 << 2) | /*EN:*/ (1 << 0);
-    // else // Close/Abort
-        // flags = /*BK:*/ (1 << 7) | /*I2:*/ (0 << 2) | /*EN:*/ (0 << 0);
-
-    return (address << 16 /*= to the start of significant bits*/) | flags;
-}
 
 void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode)
 {
@@ -402,13 +295,6 @@ void closeSlave()
 {
     printf("[INFO] (%s) %s: Closing serial port.\n", printTimestamp(), __func__);
     serialTerminate();
-    
-    //gpioInitialise();
-    //sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false);
-    //bscXfer(&sI2cTransfer);
-    //printf("[INFO] (%s) %s: Closed slave.\n", printTimestamp(), __func__);
-    gpioTerminate();
-    printf("[INFO] (%s) %s: Terminated GPIOs.\n", printTimestamp(), __func__);
 }
 
 void SIGHandler(int signum)
