@@ -17,6 +17,7 @@ typedef struct
 int serialInit();
 int serialXfer(volatile serial_xfer_t *xfer);
 int serialFlushFifoToRxBuffer(volatile serial_xfer_t *xfer);
+int serialTransmitTxBuffer(volatile serial_xfer_t *xfer);
 int serialTerminate();
 
 #endif

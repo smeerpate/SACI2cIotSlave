@@ -280,6 +280,7 @@ void listeningTask()
                     sSerialTransfer.txCnt = 5;
                     break;
             }
+            serialTransmitTxBuffer(&sSerialTransfer);
             sState = S_IDLE;
             //sState = S_ENABLEI2CPERIPH; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
             break;
@@ -405,13 +406,13 @@ void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode)
     int i;
     for(i=0; i<STRUCTS_DECKEDREPLYTOTALSIZE; i += 1)
     {
-        sI2cTransfer.txBuf[i] = pDeckedReply->ui8[i];
+        sSerialTransfer.txBuf[i] = pDeckedReply->ui8[i];
     }
     
-    sI2cTransfer.txCnt = STRUCTS_DECKEDREPLYTOTALSIZE;
+    sSerialTransfer.txCnt = STRUCTS_DECKEDREPLYTOTALSIZE;
     
-    printf("[INFO] (%s) %s: Filled i2c Tx buffer with %d bytes\n", printTimestamp(), __func__, sI2cTransfer.txCnt);
-    printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sI2cTransfer.txBuf, sI2cTransfer.txCnt, true, ", "));
+    printf("[INFO] (%s) %s: Filled serial Tx buffer with %d bytes\n", printTimestamp(), __func__, sSerialTransfer.txCnt);
+    printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sSerialTransfer.txBuf, sSerialTransfer.txCnt, true, ", "));
 }
 
 void detachI2cSlave()

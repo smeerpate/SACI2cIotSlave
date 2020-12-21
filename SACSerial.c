@@ -111,7 +111,16 @@ int serialFlushFifoToRxBuffer(volatile serial_xfer_t *xfer)
 
 int serialTransmitTxBuffer(volatile serial_xfer_t *xfer)
 {
+    unsigned char c;
+    int iTxBuffPointer = 0;
     
+    while(xfer->txCnt > iTxBuffPointer)
+    {
+        c = xfer->txBuf[iTxBuffPointer];
+        write(iTtyFd, &c, 1);
+        iTxBuffPointer += 1;
+    }
+    return 0;
 }
 
 int serialTerminate()
