@@ -155,6 +155,7 @@ void listeningTask()
     {
         case S_IDLE:
             iResult = serialFlushFifoToRxBuffer(&sSerialTransfer);
+            // TODO: don't retry to read data forever if no fale descriptor
             if(iResult == -1)
             {
                 printf("[WARNING] (%s) %s:(S_IDLE) No file discriptor for serial port.\n", printTimestamp(), __func__);
@@ -233,7 +234,6 @@ void listeningTask()
             {
                 // received correct ETX
                 bErrorResponse = I2CERRORCODE_OK;
-                //sState = S_DISSABLEI2CPERIPH;
                 sState = S_SENDHTTPREQUEST;
             }
             else
@@ -247,8 +247,7 @@ void listeningTask()
         case S_PARSECMDREADENA:
             pLastReadEnaCommand = setLastReadEnaCmd((void *)&sSerialTransfer.rxBuf[0]);
             printf("[INFO] (%s) %s:(S_PARSECMDREADENA) IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, pLastReadEnaCommand->endTag);
-            //sState = S_BUILDRESPONSE;
-            sState = S_IDLE; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
+            sState = S_IDLE;
             break;
             
 
@@ -282,14 +281,6 @@ void listeningTask()
             }
             serialTransmitTxBuffer(&sSerialTransfer);
             sState = S_IDLE;
-            //sState = S_ENABLEI2CPERIPH; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
-            break;
-        
-        case S_DISSABLEI2CPERIPH:
-            // tell master to back off
-            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Detaching I2C slave peripheral...\n", printTimestamp(), __func__);
-            //detachI2cSlave();
-            sState = S_SENDHTTPREQUEST;
             break;
             
         case S_SENDHTTPREQUEST:
@@ -302,15 +293,7 @@ void listeningTask()
                 bErrorResponse = I2CERRORCODE_SERVERUNREACH;
             }
             
-            //sState = S_ENABLEI2CPERIPH;
-            sState = S_BUILDRESPONSE; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
-            break;
-            
-        case S_ENABLEI2CPERIPH:
-            // tell master were back
-            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Re-attaching I2C slave peripheral...\n", printTimestamp(), __func__);
-            //attachI2cSlave();
-            sState = S_IDLE;
+            sState = S_BUILDRESPONSE;
             break;
             
         default:
@@ -413,41 +396,6 @@ void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode)
     
     printf("[INFO] (%s) %s: Filled serial Tx buffer with %d bytes\n", printTimestamp(), __func__, sSerialTransfer.txCnt);
     printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sSerialTransfer.txBuf, sSerialTransfer.txCnt, true, ", "));
-}
-
-void detachI2cSlave()
-{
-    if (gpioGetMode(18) != PI_INPUT)
-    {
-       gpioSetMode(18, PI_INPUT);  // set GPIO17 to ALT0
-    }
-    if (gpioGetMode(19) != PI_INPUT)
-    {
-       gpioSetMode(19, PI_INPUT);  // set GPIO17 to ALT0
-    }
-    // abort I2C and clear filo's
-    /*
-    22 21 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
-    a  a  a  a  a  a  a  -  -  IT HC TF IR RE TE BK EC ES PL PH I2 SP EN
-    */
-    sI2cTransfer.control = (I2CSALAVEADDRESS7 << 16) | 1<<9 | 1<<8 | 1<<7 | 1<<2 | 1<<0;
-    sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-    if(sI2cStatus.i32 == -1)
-    {
-        printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
-    }
-}
-
-void attachI2cSlave()
-{
-    if (gpioGetMode(18) != PI_ALT3)
-    {
-       gpioSetMode(18, PI_ALT3);  // set GPIO17 to ALT0
-    }
-    if (gpioGetMode(19) != PI_ALT3)
-    {
-       gpioSetMode(19, PI_ALT3);  // set GPIO17 to ALT0
-    }
 }
 
 void closeSlave()

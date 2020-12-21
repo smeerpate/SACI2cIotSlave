@@ -48,36 +48,6 @@ int serialInit()
     return 0;
 }
 
-
-int serialXfer(volatile serial_xfer_t *xfer)
-{
-    // unsigned char c;
-    // int iRead;
-    // int iRxBuffPointer = 0;
-    
-    // if(iTtyFd <= 0)
-    // {
-        // printf("[ERROR] (%s) %s:Failed to open serial port.\n", printTimestamp(), __func__);
-        // return -1;
-    // }
-    
-    // // Get all data from the fifo (if any) and write into RxBuffer starting from idx 0.
-    // iRead = read(iTtyFd, &c, 1);
-    // if(iRead > 0)
-    // {
-        // while(iRead > 0)
-        // {
-            // printf("Serial read #%d: 0x%02x\n", iRxBuffPointer, c);
-            // xfer->rxBuf[iRxBuffPointer] = c;
-            // iRxBuffPointer += 1; // Not a huge fan of post increment.
-            // iRead = read(iTtyFd, &c, 1);
-        // }
-        // xfer->rxCnt = iRxBuffPointer;
-    // }
-    //printf("[INFO] (%s) %s:Returning to main state machine.\n", printTimestamp(), __func__);   
-    return 0;
-}
-
 int serialFlushFifoToRxBuffer(volatile serial_xfer_t *xfer)
 {
     unsigned char c;
