@@ -96,7 +96,7 @@ int serialFlushFifoToRxBuffer(volatile serial_xfer_t *xfer)
     {
         while(iRead > 0)
         {
-            printf("Serial read #%d: 0x%02x\n", iRxBuffPointer, c);
+            //printf("Serial read #%d: 0x%02x\n", iRxBuffPointer, c);
             xfer->rxBuf[iRxBuffPointer] = c;
             iRxBuffPointer += 1; // Not a huge fan of post increment.
             if(c == IOT_FRMENDTAG)
@@ -107,6 +107,11 @@ int serialFlushFifoToRxBuffer(volatile serial_xfer_t *xfer)
     xfer->rxCnt = iRxBuffPointer;
     //printf("[INFO] (%s) %s:Returning to main state machine.\n", printTimestamp(), __func__);   
     return 0;
+}
+
+int serialTransmitTxBuffer(volatile serial_xfer_t *xfer)
+{
+    
 }
 
 int serialTerminate()

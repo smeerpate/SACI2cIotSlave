@@ -154,58 +154,31 @@ void listeningTask()
     switch (sState)
     {
         case S_IDLE:
-            // #ifdef USESERIAL
-                iResult = serialFlushFifoToRxBuffer(&sSerialTransfer);
-                if(iResult == -1)
-                {
-                    printf("[WARNING] (%s) %s:(S_IDLE) No file discriptor for serial port.\n", printTimestamp(), __func__);
-                }
-                sSerialTransfer.txCnt = 0; // set the fifo pointer to 0
-                if(sSerialTransfer.rxCnt == 0)
-                {
-                    // No new data available or busy with incoming data.
-                    sState = S_IDLE;
-                    usleep(uSleepMicrosec);
-                }
-                else
-                {
-                    printf("[INFO] (%s) %s:(S_IDLE) Received %d bytes\n", printTimestamp(), __func__, sSerialTransfer.rxCnt);
-                    printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sSerialTransfer.rxBuf, sSerialTransfer.rxCnt, true, ", "));
-                    sState = S_PARSEIOTHEADER;
-                }
-                break;
-            // #else
-                // sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-                // if(sI2cStatus.i32 == -1)
-                // {
-                    // printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
-                // }
-                // sI2cTransfer.txCnt = 0; // set the fifo pointer to 0
-                // if(sI2cTransfer.rxCnt == 0 || sI2cStatus.rxBusy == 1)
-                // {
-                // //  No new data available or busy with incoming data.
-                    // sState = S_IDLE;
-                    // usleep(uSleepMicrosec);
-                // }
-                // else
-                // {
-                    // printf("[INFO] (%s) %s:(S_IDLE) Received %d bytes\n", printTimestamp(), __func__, sI2cTransfer.rxCnt);
-                    // printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sI2cTransfer.rxBuf, sI2cTransfer.rxCnt, true, ", "));
-                    // sState = S_PARSEIOTHEADER;
-                // }
-                // break;
-            // #endif
+            iResult = serialFlushFifoToRxBuffer(&sSerialTransfer);
+            if(iResult == -1)
+            {
+                printf("[WARNING] (%s) %s:(S_IDLE) No file discriptor for serial port.\n", printTimestamp(), __func__);
+            }
+            sSerialTransfer.txCnt = 0; // set the fifo pointer to 0
+            if(sSerialTransfer.rxCnt == 0)
+            {
+                // No new data available or busy with incoming data.
+                sState = S_IDLE;
+                usleep(uSleepMicrosec);
+            }
+            else
+            {
+                printf("[INFO] (%s) %s:(S_IDLE) Received %d bytes\n", printTimestamp(), __func__, sSerialTransfer.rxCnt);
+                printf("\t#(%f) Bytes (HEX): %s\n", getTickSec(), printBytesAsHexString((uint32_t)sSerialTransfer.rxBuf, sSerialTransfer.rxCnt, true, ", "));
+                sState = S_PARSEIOTHEADER;
+            }
+            break;
             
             
             
         case S_PARSEIOTHEADER:
-            // #ifdef USESERIAL
-                printf("[INFO] (%s) %s:(S_PARSEIOTHEADER) Parsing IoT header...\n", printTimestamp(), __func__);
-                tIotCmdHeader* pIotCmdHeader = (tIotCmdHeader*)sSerialTransfer.rxBuf;
-            // #else
-                // printf("[INFO] (%s) %s:(S_PARSEIOTHEADER) Parsing IoT header...\n", printTimestamp(), __func__);
-                // tIotCmdHeader* pIotCmdHeader = (tIotCmdHeader*)sI2cTransfer.rxBuf;
-            // #endif
+            printf("[INFO] (%s) %s:(S_PARSEIOTHEADER) Parsing IoT header...\n", printTimestamp(), __func__);
+            tIotCmdHeader* pIotCmdHeader = (tIotCmdHeader*)sSerialTransfer.rxBuf;
             printf("\t#(%f) IoT header: stx=0x%02x, cmdCode=0x%02x\n", getTickSec(), pIotCmdHeader->startTag, pIotCmdHeader->cmdCode);
             if(pIotCmdHeader->startTag == IOT_FRMSTARTTAG)
             {
@@ -234,23 +207,14 @@ void listeningTask()
             printf("[ERROR] (%s) %s:(S_FLAGERROR_UNKNOWNCMD) Unknown cmdCode\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_UNKNOWNCMD; // flag error
             // Discard received data reset Rx count
-            // #ifdef USESERIAL
-                sSerialTransfer.rxCnt = 0;
-            // #else
-                // sI2cTransfer.rxCnt = 0;
-            // #endif
+            sSerialTransfer.rxCnt = 0;
             sState = S_IDLE;
             break;
             
         case S_FLAGERROR_INVALIDSTX:
             printf("[ERROR] (%s) %s:(S_FLAGERROR_INVALIDSTX) Invalid start of transmission (STX) code\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
-            // Discard received data reset Rx count
-            // #ifdef USESERIAL
-                sSerialTransfer.rxCnt = 0;
-            // #else
-                // sI2cTransfer.rxCnt = 0;
-            // #endif
+            sSerialTransfer.rxCnt = 0;
             sState = S_IDLE;
             break;
             
@@ -258,45 +222,30 @@ void listeningTask()
             printf("[ERROR] (%s) %s:(S_FLAGERROR_INVALIDETX) Invalid end of transmission (ETX) code\n", printTimestamp(), __func__);
             bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
             // Discard received data reset Rx count
-            // #ifdef USESERIAL
-                sSerialTransfer.rxCnt = 0;
-            // #else
-                // sI2cTransfer.rxCnt = 0;
-            // #endif
+            sSerialTransfer.rxCnt = 0;
             sState = S_IDLE;
             break;
             
         case S_PARSECMDSEND:
-            // #ifdef USESERIAL
-                pLastSendCommand = setLastSendCmd((void *)&sSerialTransfer.rxBuf[0]);
-            // #else
-                // pLastSendCommand = setLastSendCmd((void *)&sI2cTransfer.rxBuf[0]);
-            // #endif
+            pLastSendCommand = setLastSendCmd((void *)&sSerialTransfer.rxBuf[0]);
             printf("[INFO] (%s) %s:(S_PARSECMDSEND) IoT send command: payload size = %i, payload at 0x%x, ETX = 0x%x\n", printTimestamp(), __func__, pLastSendCommand->payloadSize, (uint32_t)pLastSendCommand->payload, pLastSendCommand->endTag);
             if (pLastSendCommand->endTag == IOT_FRMENDTAG)
             {
                 // received correct ETX
                 bErrorResponse = I2CERRORCODE_OK;
-                sState = S_DISSABLEI2CPERIPH;
+                //sState = S_DISSABLEI2CPERIPH;
+                sState = S_SENDHTTPREQUEST;
             }
             else
             {
-                // // received incorrect ETX
-                // bErrorResponse = I2CERRORCODE_CMDPROCESSING; // flag error
+                // received incorrect ETX
                 sState = S_FLAGERROR_INVALIDETX;
             }
-            // // were done with the received data reset Rx count
-            // sI2cTransfer.rxCnt = 0;
-            // sState = S_IDLE;
             break;
             
            
         case S_PARSECMDREADENA:
-            // #ifdef USESERIAL
-                pLastReadEnaCommand = setLastReadEnaCmd((void *)&sSerialTransfer.rxBuf[0]);
-            // #else
-                // pLastReadEnaCommand = setLastReadEnaCmd((void *)&sI2cTransfer.rxBuf[0]);
-            // #endif
+            pLastReadEnaCommand = setLastReadEnaCmd((void *)&sSerialTransfer.rxBuf[0]);
             printf("[INFO] (%s) %s:(S_PARSECMDREADENA) IoT read enable command: ETX = 0x%x\n", printTimestamp(), __func__, pLastReadEnaCommand->endTag);
             //sState = S_BUILDRESPONSE;
             sState = S_IDLE; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
@@ -331,20 +280,8 @@ void listeningTask()
                     sSerialTransfer.txCnt = 5;
                     break;
             }
-            // Make sure the mode is right.
-            /*
-            22 21 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
-            a  a  a  a  a  a  a  -  -  IT HC TF IR RE TE BK EC ES PL PH I2 SP EN
-            */
-            // sI2cTransfer.control = (I2CSALAVEADDRESS7 << 16) | 1<<9 | 1<<8 | 1<<2 | 1<<0;
-            // sI2cStatus.i32 = bscXfer(&sI2cTransfer);
-            // if(sI2cStatus.i32 == -1)
-            // {
-                // printf("[WARNING] (%s) %s:(S_IDLE) Detected i2c slave timeout.\n", printTimestamp(), __func__);
-            // }
-            // sI2cTransfer.txCnt = 0; // set the fifo pointer to 0. Important to set this so master can read the right data.
-            //sState = S_IDLE;
-            sState = S_ENABLEI2CPERIPH; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
+            sState = S_IDLE;
+            //sState = S_ENABLEI2CPERIPH; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
             break;
         
         case S_DISSABLEI2CPERIPH:
@@ -363,9 +300,6 @@ void listeningTask()
             {
                 bErrorResponse = I2CERRORCODE_SERVERUNREACH;
             }
-            
-            // were done with the received data reset Rx count
-            //sI2cTransfer.rxCnt = 0;
             
             //sState = S_ENABLEI2CPERIPH;
             sState = S_BUILDRESPONSE; // testje-------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!
