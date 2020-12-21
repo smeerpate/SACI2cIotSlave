@@ -34,6 +34,7 @@
 #include "SACServerComms.h"
 #include "SACPrintUtils.h"
 #include "SACStructs.h"
+#include "SACSerial.h"
 
 /********************** Globals *********************/
 uint32_t uSleepMicrosec = 1000; // number of micro seconds to sleep if no i2c transaction received. 32bytes take about 3.2ms to transmit.
@@ -52,6 +53,8 @@ typedef struct
 volatile bsc_xfer_t sI2cTransfer; // i2c transfer struct
 volatile tBscStatus sI2cStatus;
 tSmState sState = S_IDLE;
+
+volatile serial_xfer_t sSerialTransfer;
 /****************************************************/
 
 
@@ -73,6 +76,8 @@ void SIGHandler(int signum);
 /****************** Implementation ******************/
 uint8_t slave_init()
 {
+    serialInit();
+    
     int iResult = gpioInitialise();
     if(iResult < 0)
     {
@@ -145,6 +150,8 @@ void listeningTask()
     switch (sState)
     {
         case S_IDLE:
+            serialXfer(&sSerialTransfer);
+            
             sI2cStatus.i32 = bscXfer(&sI2cTransfer);
             if(sI2cStatus.i32 == -1)
             {
@@ -304,8 +311,8 @@ void listeningTask()
         
         case S_DISSABLEI2CPERIPH:
             // tell master to back off
-            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Detaching I2C slave peripheral...", printTimestamp(), __func__);
-            detachI2cSlave();
+            printf("[INFO] (%s) %s:(S_DISSABLEI2CPERIPH) Detaching I2C slave peripheral...\n", printTimestamp(), __func__);
+            //detachI2cSlave();
             sState = S_SENDHTTPREQUEST;
             break;
             
@@ -328,8 +335,8 @@ void listeningTask()
             
         case S_ENABLEI2CPERIPH:
             // tell master were back
-            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Re-attaching I2C slave peripheral...", printTimestamp(), __func__);
-            attachI2cSlave();
+            printf("[INFO] (%s) %s:(S_ENABLEI2CPERIPH) Re-attaching I2C slave peripheral...\n", printTimestamp(), __func__);
+            //attachI2cSlave();
             sState = S_IDLE;
             break;
             
@@ -472,10 +479,13 @@ void attachI2cSlave()
 
 void closeSlave()
 {
-    gpioInitialise();
-    sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false);
-    bscXfer(&sI2cTransfer);
-    printf("[INFO] (%s) %s: Closed slave.\n", printTimestamp(), __func__);
+    printf("[INFO] (%s) %s: Closing serial port.\n", printTimestamp(), __func__);
+    serialTerminate();
+    
+    //gpioInitialise();
+    //sI2cTransfer.control = getControlBits(I2CSALAVEADDRESS7, false, false);
+    //bscXfer(&sI2cTransfer);
+    //printf("[INFO] (%s) %s: Closed slave.\n", printTimestamp(), __func__);
     gpioTerminate();
     printf("[INFO] (%s) %s: Terminated GPIOs.\n", printTimestamp(), __func__);
 }
