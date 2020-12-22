@@ -54,7 +54,7 @@ void listeningTask();
 void closeSlave();
 float getTickSec();
 int getControlBits(int address, bool open, bool rxEnable);
-void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode);
+void copyDeckedReplyToSerialTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode);
 void detachI2cSlave();
 void attachI2cSlave();
 void closeSlave();
@@ -225,7 +225,7 @@ void listeningTask()
                     break;
                 case 0x01:
                     // Master (i.e. SAC controller) DID ask for downlink data via i2c.
-                    copyDeckedReplyToI2cTxBuffer(0x02, bErrorResponse);
+                    copyDeckedReplyToSerialTxBuffer(0x02, bErrorResponse);
                     break;
                 default:
                     // unknown response code
@@ -268,7 +268,7 @@ float getTickSec()
 }
 
 
-void copyDeckedReplyToI2cTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode)
+void copyDeckedReplyToSerialTxBuffer(uint8_t bCmdCode, uint8_t bErrorCode)
 {
     tCtrlDeckedReply *pDeckedReply = getCtrlDeckedReply(); // get the address of the last saved decked reply
     // build header and footer around decked reply payload

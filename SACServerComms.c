@@ -17,13 +17,14 @@
 #define MAXSERVERREPLYLINES     64
 
 #define ADDUSERREPLYINREQUEST   1 //1
-#define USERREPLYINREQUEST      "35291f03beefbabe"
+#define USERREPLYINREQUEST      "35291f03beefdead"
 
 /****************** private function prototypes *********************/
 int httpSocketInit();
 int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
 int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn);
 int httpParseReplyMsg(char *sRawMessage);
+char* prunePayloadFromJSON(char *sJSON);
 /********************************************************************/
 
 /******************** private global variables **********************/
@@ -411,6 +412,7 @@ int httpParseReplyMsg(char *sRawMessage)
     {
         // get payload
         iPayloadLineIndex = iBlankLineIndex + 2;
+        apLines[iPayloadLineIndex] = prunePayloadFromJSON(apLines[iPayloadLineIndex]);
         printf("[INFO] %s: Found payload line at substring index %i with content:\n\t%s\n", __func__, iPayloadLineIndex, apLines[iPayloadLineIndex]);
     }
     
@@ -429,6 +431,27 @@ int httpParseReplyMsg(char *sRawMessage)
     // clear the original message, we're done with it + it's been corrupted by strok
     memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
     return 0;
+}
+
+/*
+    Example http response from server: 
+    {"SC-4GTEST":{"downlinkData":"360f1f73deadbeef"}}
+    This function isolates the payload: 360f1f73deadbeef.
+    returns a pointer to the start of the payload.
+    put a \0 character directly after the payload
+    Function is destructive.
+*/
+char* prunePayloadFromJSON(char *sJSON)
+{
+    char *pReturnPointer = 0;
+    // look for the first occurance of '}'
+    pReturnPointer = strchr(sJSON, '}');
+    // go back 17 positions
+    pReturnPointer = pReturnPointer - 17;
+    // replace index 16 with \0
+    *(pReturnPointer + 16) = '\0';
+    
+    return pReturnPointer;
 }
 
 /*********************** sslInit ****************************
