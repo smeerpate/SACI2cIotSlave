@@ -118,6 +118,8 @@ void listeningTask()
             if(iResult == -1)
             {
                 printf("[WARNING] (%s) %s:(S_IDLE) No file discriptor for serial port.\n", printTimestamp(), __func__);
+                sState = S_IDLE;
+                usleep(1000000); // wait 1 second
             }
             sSerialTransfer.txCnt = 0; // set the fifo pointer to 0
             if(sSerialTransfer.rxCnt == 0)
@@ -133,8 +135,6 @@ void listeningTask()
                 sState = S_PARSEIOTHEADER;
             }
             break;
-            
-            
             
         case S_PARSEIOTHEADER:
             printf("[INFO] (%s) %s:(S_PARSEIOTHEADER) Parsing IoT header...\n", printTimestamp(), __func__);

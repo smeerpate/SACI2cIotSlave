@@ -24,11 +24,11 @@ int serialInit()
     sTio.c_oflag = 0;
     sTio.c_cflag = CS8 | CREAD | CLOCAL; // 8n1, see termios.h for more information
     sTio.c_lflag = 0;
-    sTio.c_cc[VMIN] = 0; // number of bytes needed for read to return (only in blocking mode?)
-    sTio.c_cc[VTIME] = 1; // integer value in "deciseconds" :-)
+    sTio.c_cc[VMIN] = 200;//1; // number of bytes needed for read to return (only in blocking mode?)
+    sTio.c_cc[VTIME] = 5; // integer value in "deciseconds" :-)
     
     // TODO: ACM* number might change: 0, 1, ...
-    iTtyFd = open(sPortName, O_RDWR);        // O_NONBLOCK might override VMIN and VTIME, so read() may return immediately.
+    iTtyFd = open(sPortName, O_RDWR /*| O_NONBLOCK*/);        // O_NONBLOCK might override VMIN and VTIME, so read() may return immediately.
     if(iTtyFd <= -1)
     {
         // Failed to open port.
@@ -69,12 +69,13 @@ int serialFlushFifoToRxBuffer(volatile serial_xfer_t *xfer)
             printf("Serial read #%d: 0x%02x\n", iRxBuffPointer, c);
             xfer->rxBuf[iRxBuffPointer] = c;
             iRxBuffPointer += 1; // Not a huge fan of post increment.
-            //if(c == IOT_FRMENDTAG)
-            //    break;
+            if(c == IOT_FRMENDTAG)
+                break;
             iRead = read(iTtyFd, &c, 1);
         }
     }
     xfer->rxCnt = iRxBuffPointer;
+    tcflush(iTtyFd, TCIFLUSH);
     //printf("[INFO] (%s) %s:Returning to main state machine.\n", printTimestamp(), __func__);   
     return 0;
 }

@@ -16,7 +16,7 @@
 #define DOWNSTREAMBUFFERSIZE    32
 #define MAXSERVERREPLYLINES     64
 
-#define ADDUSERREPLYINREQUEST   1 //1
+#define ADDUSERREPLYINREQUEST   0 //1
 #define USERREPLYINREQUEST      "35291f03beefdead"
 
 /****************** private function prototypes *********************/
@@ -279,7 +279,7 @@ void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
     tServerRequest *sRequest = getLastServerRequest();
     sprintf(sRequest->host, "%s", IOT_HOST);
     sprintf(sRequest->path, "%s", IOT_PATH);
-    sprintf(sRequest->deviceId, "%s", IOT_DEVICEID);
+    sprintf(sRequest->deviceId, "%s", sDeviceId/*IOT_DEVICEID*/);
     //sprintf(sRequest->deviceId, "%s", sDeviceId);
     sRequest->time = printGetUnixEpochTimeAsInt();//1594998140;
     sRequest->seqNr = muiSeqNr;
@@ -345,7 +345,7 @@ int httpParseReplyMsg(char *sRawMessage)
     
     while(pTemp != NULL && iNTokens < MAXSERVERREPLYLINES)
 	{
-		printf("\t# %s #\n", pTemp);
+		// printf("\t# %s #\n", pTemp);
         apLines[iNTokens] = pTemp;
         pTemp = strtok(NULL, asDelimiters);
         iNTokens += 1;
