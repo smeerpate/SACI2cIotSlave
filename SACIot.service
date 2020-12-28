@@ -4,13 +4,14 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/home/pi/iot/SACRPiIotSlave
+ExecStart=/home/pi/iot/SACI2cIotSlave/SACRPiIotSlave
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=SACIotSlave
+SyslogIdentifier=SACIotSlave 
 Restart=on-failure
 RestartSec=10
 KillMode=process
 
 [Install]
 WantedBy=multi-user.target
+
