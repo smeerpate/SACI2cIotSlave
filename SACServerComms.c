@@ -19,6 +19,8 @@
 #define ADDUSERREPLYINREQUEST   0 //1
 #define USERREPLYINREQUEST      "35291f03beefdead"
 
+#define DEVICEIDSTRINGLENGTH	100
+
 /****************** private function prototypes *********************/
 int httpSocketInit();
 int httpWriteMsgToSocket(int iSocketFd, SSL *sSSLConn);
@@ -38,6 +40,7 @@ char msHttpTxMessage[HTTPMSGMAXSIZE] = {0x00};
 char msHttpRxMessage[HTTPMSGMAXSIZE] = {0x00};
 SSL_CTX *sSSLContext;
 uint32_t muiSeqNr = 0;
+static char sDeviceId[DEVICEIDSTRINGLENGTH] = {0};
 /********************************************************************/
 
 
@@ -269,8 +272,7 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
 ************************************************************/
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 {
-    char sDeviceId[100];
-    gethostname(sDeviceId, 99);
+    gethostname(sDeviceId, DEVICEIDSTRINGLENGTH - 1);
     printf("[INFO] (%s) %s: Device ID is \'%s\'.\n", printTimestamp(), __func__, sDeviceId);
     
     char *pUpstreamDataString = printBytesAsHexString(I2CRxPayloadAddress, I2CRxPayloadLength, false, NULL);
