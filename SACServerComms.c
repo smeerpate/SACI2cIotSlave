@@ -269,8 +269,8 @@ int httpReadRespFromSocket(int iSocketFd, SSL *sSSLConn)
 ************************************************************/
 void httpBuildRequestMsg(uint32_t I2CRxPayloadAddress, int I2CRxPayloadLength)
 {
-    char sDeviceId[256];
-    gethostname(sDeviceId, 256);
+    char sDeviceId[100];
+    gethostname(sDeviceId, 99);
     printf("[INFO] (%s) %s: Device ID is \'%s\'.\n", printTimestamp(), __func__, sDeviceId);
     
     char *pUpstreamDataString = printBytesAsHexString(I2CRxPayloadAddress, I2CRxPayloadLength, false, NULL);
