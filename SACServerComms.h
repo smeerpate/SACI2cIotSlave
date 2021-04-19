@@ -8,7 +8,7 @@
 #define USESSL                  1
 #define IOT_FRMSTARTTAG         '#'
 #define IOT_FRMENDTAG           '\n'
-#define IOT_HOST                "safeandclean.dieterprovoost.be"//"dashboard.safeandclean.be" // TODO: assert that string length is <= than STRUCTS_SERVREQ_MAXSTRSIZE
+#define IOT_HOST                "dashboard.safeandclean.be" //"safeandclean.dieterprovoost.be"// TODO: assert that string length is <= than STRUCTS_SERVREQ_MAXSTRSIZE
 #define IOT_PATH                "/mobile/webhook" // Todo assert that string length is <= than STRUCTS_SERVREQ_MAXSTRSIZE
 #define IOT_DEVICEID            "SC-4GTEST" // Todo assert that string length is <= than STRUCTS_SERVREQ_MAXSTRSIZE
 
