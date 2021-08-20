@@ -50,6 +50,7 @@ void structsInitLastServerRequest()
 void structsInitCtrlDeckedReply()
 {
     memset((void *)&sCtrlDeckedReply, 0x00, sizeof(tCtrlDeckedReply));
+    printf("[INFO] %s: sCtrlDeckedReply object at address: %x\n", __func__, &sCtrlDeckedReply);
 }
 /********************************/
 

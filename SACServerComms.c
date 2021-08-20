@@ -433,7 +433,7 @@ int httpParseReplyMsg(char *sRawMessage)
     }
     else
     {
-        printf("[WARNING] %s: Failed to get Decked Reply from SAC arduino controller.\n", __func__);
+        printf("[WARNING] %s: Failed to get Decked Reply with data for SAC arduino controller.\n", __func__);
     }
     
     // second line after the blank line is payload.
