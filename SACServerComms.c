@@ -426,11 +426,15 @@ int httpParseReplyMsg(char *sRawMessage)
     //printf("\t\'%s\'\n", printSplitByteStringInBytes(apLines[iPayloadLineIndex], ','));
     tCtrlDeckedReply *pReplyForController = getCtrlDeckedReply();
     if(pReplyForController == NULL)
+    {
         int iNBytesParsed = printParseHexStringToBytes(apLines[iPayloadLineIndex], pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE);
         printf("[INFO] (%s) %s: parsed %d bytes\n", printTimestamp(), __func__, iNBytesParsed);
         printf("\t# Bytes (HEX): %s\n", printBytesAsHexString((uint32_t)pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE, true, ", "));
+    }
     else
+    {
         printf("[WARNING] %s: Failed to get Decked Reply from SAC arduino controller.\n", __func__);
+    }
     
     // second line after the blank line is payload.
     // it should be 16 characters long
