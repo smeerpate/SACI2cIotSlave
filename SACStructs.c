@@ -1,5 +1,6 @@
 #include "SACStructs.h"
 #include "string.h" /* memcpy, memset */
+#include "stdio.h"
 
 /****************** private function prototypes *********************/
 void structsInitLastSendCmd();
