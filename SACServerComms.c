@@ -425,7 +425,7 @@ int httpParseReplyMsg(char *sRawMessage)
     
     //printf("\t\'%s\'\n", printSplitByteStringInBytes(apLines[iPayloadLineIndex], ','));
     tCtrlDeckedReply *pReplyForController = getCtrlDeckedReply();
-    if(pReplyForController == NULL)
+    if(pReplyForController != NULL)
     {
         int iNBytesParsed = printParseHexStringToBytes(apLines[iPayloadLineIndex], pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE);
         printf("[INFO] (%s) %s: parsed %d bytes\n", printTimestamp(), __func__, iNBytesParsed);
