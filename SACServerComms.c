@@ -403,7 +403,7 @@ int httpParseReplyMsg(char *sRawMessage)
     }
     if(iBlankLineIndex < 0)
     {
-        // No blank lines found in sever reply.
+        // No blank lines found in sever reply. Suspecting bad response
         printf("[ERROR] %s: Found no blank lines in server reply.\n", __func__);
         memset(msHttpRxMessage, 0, sizeof(msHttpRxMessage));
         return -3;
@@ -417,12 +417,20 @@ int httpParseReplyMsg(char *sRawMessage)
         apLines[iPayloadLineIndex] = prunePayloadFromJSON(apLines[iPayloadLineIndex]);
         printf("[INFO] %s: Found payload line at substring index %i with content:\n\t%s\n", __func__, iPayloadLineIndex, apLines[iPayloadLineIndex]);
     }
+    if (iReplyCode == 204)
+    {
+        printf("[INFO] %s: Reply code 204, server returned no payload.\n", __func__);
+    }
+    
     
     //printf("\t\'%s\'\n", printSplitByteStringInBytes(apLines[iPayloadLineIndex], ','));
     tCtrlDeckedReply *pReplyForController = getCtrlDeckedReply();
-    int iNBytesParsed = printParseHexStringToBytes(apLines[iPayloadLineIndex], pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE);
-    printf("[INFO] (%s) %s: parsed %d bytes\n", printTimestamp(), __func__, iNBytesParsed);
-    printf("\t# Bytes (HEX): %s\n", printBytesAsHexString((uint32_t)pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE, true, ", "));
+    if(pReplyForController == NULL)
+        int iNBytesParsed = printParseHexStringToBytes(apLines[iPayloadLineIndex], pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE);
+        printf("[INFO] (%s) %s: parsed %d bytes\n", printTimestamp(), __func__, iNBytesParsed);
+        printf("\t# Bytes (HEX): %s\n", printBytesAsHexString((uint32_t)pReplyForController->payload, STRUCTS_DECKEDREPLYPAYLOADSIZE, true, ", "));
+    else
+        printf("[WARNING] %s: Failed to get Decked Reply from SAC arduino controller.\n", __func__);
     
     // second line after the blank line is payload.
     // it should be 16 characters long
